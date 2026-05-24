@@ -1,8 +1,15 @@
-import { createBrowserClient } from "@supabase/ssr";
+import { createBrowserClient } from '@supabase/ssr';
 
 export function createClient() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  // 1. Pega aquí tus claves reales DENTRO de las comillas
+  const supabaseUrl = 'https://yokwjkiwfqwrmmivvpym.supabase.co/rest/v1/'; 
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlva3dqa2l3ZnF3cm1taXZ2cHltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MzA5MjMsImV4cCI6MjA5NTIwNjkyM30.M-Ks2udPwFa_z9lv5X5_bzevpeL0txRHFKN0yo5iKtI  ';
+
+  // 2. Chivatos para la consola
+  console.log("=== DEBUG SUPABASE ===");
+  console.log("URL leída:", supabaseUrl);
+  console.log("La clave empieza por:", supabaseKey.substring(0, 15) + "...");
+
+  // 3. Inicialización
+  return createBrowserClient(supabaseUrl, supabaseKey);
 }
