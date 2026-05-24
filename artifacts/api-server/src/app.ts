@@ -5,19 +5,14 @@ import { IncomingMessage, ServerResponse } from "http";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
-// Extendemos el tipo nativo de Node para que TypeScript reconozca el 'id' que inyecta pino
-interface PinoRequest extends IncomingMessage {
-  id?: string | number;
-}
-
 const app: Express = express();
 
-// @ts-expect-error - Ignoramos el falso positivo de tipo callable por el conflicto ESM/CJS en Vercel
 app.use(
+  // @ts-ignore - Vercel TS2349: Conflicto de tipos ESM/CJS al invocar pinoHttp
   pinoHttp({
     logger,
     serializers: {
-      req(req: PinoRequest) {
+      req(req: IncomingMessage & { id?: unknown }) {
         return {
           id: req.id,
           method: req.method,
