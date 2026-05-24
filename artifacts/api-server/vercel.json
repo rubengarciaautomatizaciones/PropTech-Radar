@@ -1,14 +1,9 @@
 {
   "version": 2,
-  "functions": {
-    "dist/index.mjs": {
-      "runtime": "nodejs20.x"
-    }
-  },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "dist/index.mjs"
+      "source": "/api/(.*)",
+      "destination": "/dist/index.mjs"
     }
   ]
 }
