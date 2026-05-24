@@ -1,11 +1,12 @@
-import { Router, type IRouter, type Request, type Response } from "express";
+import { Router, type Request, type Response } from "express";
 import { HealthCheckResponse } from "@workspace/api-zod";
 
-const router: IRouter = Router();
+const router = Router();
 
-router.get("/healthz", (_req: Request, res: Response) => {
+// Usamos el tipado directo en la función de callback
+router.get("/healthz", (req: Request, res: Response) => {
   const data = HealthCheckResponse.parse({ status: "ok" });
-  res.json(data);
+  res.status(200).json(data);
 });
 
 export default router;
