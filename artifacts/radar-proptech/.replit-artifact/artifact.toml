@@ -1,0 +1,21 @@
+kind = "web"
+previewPath = "/"
+title = "Radar PropTech"
+version = "1.0.0"
+id = "artifacts/radar-proptech"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19946
+
+[services.development]
+run = "pnpm --filter @workspace/radar-proptech run dev"
+
+[services.env]
+PORT = "19946"
