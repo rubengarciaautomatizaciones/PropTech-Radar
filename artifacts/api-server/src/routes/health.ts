@@ -1,12 +1,9 @@
-import { Router, type Request, type Response } from "express";
-import { HealthCheckResponse } from "@workspace/api-zod";
+import { Router } from "express";
 
 const router = Router();
 
-// Usamos el tipado directo en la función de callback
-router.get("/healthz", (req: Request, res: Response) => {
-  const data = HealthCheckResponse.parse({ status: "ok" });
-  res.status(200).json(data);
+router.get("/healthz", (req: any, res: any) => {
+  res.status(200).json({ status: "ok" });
 });
 
 export default router;

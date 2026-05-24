@@ -16,6 +16,7 @@ async function buildAll() {
 
   await esbuild({
     entryPoints: [path.resolve(artifactDir, "src/index.ts")],
+    tsconfig: "./tsconfig.json", // <-- AÑADE ESTA LÍNEA
     platform: "node",
     bundle: true,
     format: "esm",
@@ -28,6 +29,8 @@ async function buildAll() {
     // - uses native modules and loads them dynamically (e.g. sharp)
     // - use path traversal to read files (e.g. @google-cloud/secret-manager loads sibling .proto files)
     external: [
+      "@workspace/api-zod",
+      "@workspace/db",
       "*.node",
       "sharp",
       "better-sqlite3",
