@@ -1,13 +1,15 @@
 {
-  "functions": {
-    "artifacts/api-server/dist/index.mjs": {
-      "runtime": "nodejs20.x"
-    }
-  },
-  "routes": [
+  "version": 2,
+  "builds": [
     {
-      "src": "/api/(.*)",
-      "dest": "artifacts/api-server/dist/index.mjs"
+      "src": "artifacts/api-server/build.mjs",
+      "use": "@vercel/node"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "artifacts/api-server/dist/index.mjs"
     }
   ]
 }
