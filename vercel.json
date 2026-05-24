@@ -1,8 +1,13 @@
 {
-  "rewrites": [
+  "functions": {
+    "artifacts/api-server/dist/index.mjs": {
+      "runtime": "nodejs20.x"
+    }
+  },
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "destination": "/artifacts/api-server/dist/index.mjs"
+      "src": "/api/(.*)",
+      "dest": "artifacts/api-server/dist/index.mjs"
     }
   ]
 }

@@ -16,9 +16,12 @@ async function buildAll() {
 
   await esbuild({
     entryPoints: [path.resolve(artifactDir, "src/index.ts")],
-    tsconfig: "./tsconfig.json", // <-- AÑADE ESTA LÍNEA
     platform: "node",
     bundle: true,
+    // AÑADE ESTO:
+    treeShaking: false, // Evita que esbuild borre código que cree que no usas
+    minify: false,      // Facilita ver qué está pasando si falla
+    // ----------------
     format: "esm",
     outdir: distDir,
     outExtension: { ".js": ".mjs" },

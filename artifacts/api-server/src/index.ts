@@ -1,3 +1,5 @@
+import app from "./app.js"; // Importante: usa .js en la extensión
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
