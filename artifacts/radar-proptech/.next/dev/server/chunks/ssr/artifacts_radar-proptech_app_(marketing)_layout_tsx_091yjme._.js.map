@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///home/runner/workspace/artifacts/radar-proptech/app/%28marketing%29/layout.tsx"],"sourcesContent":["export default function MarketingLayout({ children }: { children: React.ReactNode }) {\n  return <div className=\"min-h-screen flex flex-col\">{children}</div>;\n}\n"],"names":["MarketingLayout","children","className"],"mappings":";;;;;;AAAe,SAASA,gBAAgB,EAAEC,QAAQ,EAAiC;IACjF,qBAAO,6WAAC;QAAIC,WAAU;kBAA8BD;;;;;;AACtD"}}]
-}

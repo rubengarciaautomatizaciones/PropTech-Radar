@@ -1,14 +1,17 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
-export default function SignUpPage(props: { searchParams: Promise<{ message: string }> }) {
+export default async function SignUpPage(props: { searchParams: Promise<{ message: string }> }) {
+  const searchParams = await props.searchParams;
+  const message = searchParams.message;
+
   const signUp = async (formData: FormData) => {
     "use server";
 
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const agencyName = formData.get("agencyName") as string;
-    
+
     const supabase = await createClient();
 
     // Supabase creará el usuario y guardará el nombre de la agencia en los metadatos
@@ -26,8 +29,8 @@ export default function SignUpPage(props: { searchParams: Promise<{ message: str
       return redirect("/signup?message=" + error.message);
     }
 
-    // Si todo va bien, mandamos al usuario a una pantalla de éxito o al dashboard
-    return redirect("/login?message=Revisa tu correo para confirmar la cuenta");
+    // REDIRECCIÓN CORREGIDA: Ahora envía al usuario a la página de verificación
+    return redirect("/verify-email");
   };
 
   return (
@@ -36,6 +39,12 @@ export default function SignUpPage(props: { searchParams: Promise<{ message: str
         <h1 className="text-3xl font-bold text-slate-900">Crear Agencia</h1>
         <p className="text-gray-500 mt-2">Empieza tu trial de 3 días en Radar PropTech</p>
       </div>
+
+      {message && (
+        <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-lg text-sm text-center">
+          {message}
+        </div>
+      )}
 
       <form action={signUp} className="space-y-6">
         <div>
@@ -87,7 +96,7 @@ export default function SignUpPage(props: { searchParams: Promise<{ message: str
           Registrar Agencia
         </button>
       </form>
-      
+
       <div className="mt-6 text-center text-sm text-gray-600">
         ¿Ya tienes cuenta? <a href="/login" className="text-blue-600 font-semibold hover:underline">Inicia sesión</a>
       </div>

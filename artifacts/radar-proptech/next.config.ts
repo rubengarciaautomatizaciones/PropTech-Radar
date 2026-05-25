@@ -1,13 +1,11 @@
 import type { NextConfig } from "next";
 
+const devOrigins = process.env.REPLIT_DOMAINS
+  ? process.env.REPLIT_DOMAINS.split(",").map((d) => d.trim())
+  : [];
+
 const nextConfig: NextConfig = {
-  typescript: {
-    // Esto evita que el error de tipo que nos da el build detenga el despliegue
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  allowedDevOrigins: devOrigins,
 };
 
 export default nextConfig;

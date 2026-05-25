@@ -1,0 +1,13 @@
+export default function BillingPage() {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">Facturación y Suscripción</h1>
+        <p className="text-sm text-slate-500 mt-1">Gestiona tu plan y métodos de pago</p>
+      </div>
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-8 flex flex-col items-center justify-center text-center gap-4">
+        <p className="text-slate-500 text-sm">Módulo de facturación próximamente disponible.</p>
+      </div>
+    </div>
+  );
+}

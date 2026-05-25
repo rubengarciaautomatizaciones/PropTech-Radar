@@ -1,3 +1,5 @@
-export default function BillingPage() {
-  return <h1 className="text-2xl font-bold">Facturación y Suscripción</h1>;
+import { redirect } from "next/navigation";
+
+export default function BillingRedirect() {
+  redirect("/dashboard/billing");
 }

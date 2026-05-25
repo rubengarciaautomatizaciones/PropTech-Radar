@@ -1,3 +1,5 @@
-export default function TeamPage() {
-  return <h1 className="text-2xl font-bold">Gestión de Equipo</h1>;
+import { redirect } from "next/navigation";
+
+export default function TeamRedirect() {
+  redirect("/dashboard/team");
 }
