@@ -10,12 +10,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.49.4",
     "@supabase/ssr": "^0.6.1",
+    "@supabase/supabase-js": "^2.49.4",
     "lucide-react": "^0.545.0",
-    "next": "15.3.3",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "next": "16.2.6",
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
@@ -23,7 +23,7 @@
     "@types/react-dom": "^19.0.0",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.0.0",
-    "eslint-config-next": "15.3.3",
+    "eslint-config-next": "16.2.6",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.9.3"

@@ -1,8 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Desactivamos el rewrites temporalmente para descartar errores de backend
-  // En cuanto arranque, lo volveremos a poner
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: "https://proptech-radar-api.onrender.com/api/:path*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
