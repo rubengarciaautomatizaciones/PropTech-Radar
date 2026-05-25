@@ -1,19 +1,18 @@
-import type { Metadata } from "next";
 import "./globals.css";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Radar PropTech",
-  description: "Panel de Control - Plataforma SaaS PropTech",
+  description: "La herramienta definitiva para inmobiliarias",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="es">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased text-gray-900">{children}</body>
     </html>
   );
 }
