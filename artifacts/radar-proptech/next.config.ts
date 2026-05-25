@@ -1,12 +1,11 @@
 import type { NextConfig } from "next";
 
+const devOrigins = process.env.REPLIT_DOMAINS
+  ? process.env.REPLIT_DOMAINS.split(",").map((d) => d.trim())
+  : [];
+
 const nextConfig: NextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  allowedDevOrigins: devOrigins,
   async rewrites() {
     return [
       {

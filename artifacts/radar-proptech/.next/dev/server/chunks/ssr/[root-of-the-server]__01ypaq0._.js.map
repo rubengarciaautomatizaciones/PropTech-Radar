@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 10, "column": 0}, "map": {"version":3,"sources":["file:///home/runner/workspace/artifacts/radar-proptech/app/%28auth%29/login/page.tsx"],"sourcesContent":["export default function Login() { return <h1>Iniciar Sesión</h1>; }\n"],"names":["Login"],"mappings":";;;;;;AAAe,SAASA;IAAU,qBAAO,6WAAC;kBAAG;;;;;;AAAqB"}}]
+}
