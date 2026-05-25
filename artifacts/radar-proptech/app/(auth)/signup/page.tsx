@@ -1,3 +1,3 @@
-export default function SignUpPage() {
-  return <h1>Página de Registro</h1>;
+export default function SignUp() {
+  return <h1>Página de Registro - Funciona</h1>;
 }
