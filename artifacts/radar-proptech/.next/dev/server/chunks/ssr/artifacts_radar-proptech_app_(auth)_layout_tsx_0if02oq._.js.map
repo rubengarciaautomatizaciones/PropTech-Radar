@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///home/runner/workspace/artifacts/radar-proptech/app/%28auth%29/layout.tsx"],"sourcesContent":["export default function AuthLayout({ children }: { children: React.ReactNode }) {\n  return <div className=\"min-h-screen flex items-center justify-center bg-gray-50\">{children}</div>;\n}\n"],"names":["AuthLayout","children","className"],"mappings":";;;;;;AAAe,SAASA,WAAW,EAAEC,QAAQ,EAAiC;IAC5E,qBAAO,6WAAC;QAAIC,WAAU;kBAA4DD;;;;;;AACpF"}}]
+}

@@ -1,0 +1,18 @@
+{
+  "node": {
+    "40dba2d6f3b3e7656d00088d9c3c090e9b4d176916": {
+      "workers": {
+        "app/(auth)/signup/page": {
+          "moduleId": "[project]/artifacts/radar-proptech/.next-internal/server/app/(auth)/signup/page/actions.js { ACTIONS_MODULE0 => \"[project]/artifacts/radar-proptech/app/(auth)/signup/page.tsx [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "$$RSC_SERVER_ACTION_0",
+          "filename": "artifacts/radar-proptech/app/(auth)/signup/page.tsx"
+        }
+      },
+      "filename": "artifacts/radar-proptech/app/(auth)/signup/page.tsx",
+      "exportedName": "$$RSC_SERVER_ACTION_0"
+    }
+  },
+  "edge": {},
+  "encryptionKey": "tJ0Vk4KobF6rUiJY/eKRAqbfmVZi79CKDS53UWt7seQ="
+}
