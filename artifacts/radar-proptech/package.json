@@ -9,24 +9,25 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.6.1",
-    "@supabase/supabase-js": "^2.49.4",
-    "lucide-react": "^0.545.0",
+    "@supabase/ssr": "0.6.1",
+    "@supabase/supabase-js": "2.106.1",
+    "@tanstack/react-query": "5.100.14",
+    "lucide-react": "0.545.0",
     "next": "15.3.3",
-    "react": "catalog:",
-    "react-dom": "catalog:",
-    "stripe": "^22.1.1"
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "stripe": "22.1.1"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.5",
-    "@types/node": "^22.0.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "autoprefixer": "^10.4.20",
-    "eslint": "^9.0.0",
+    "@eslint/eslintrc": "3.3.5",
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.15",
+    "@types/react-dom": "19.2.3",
+    "autoprefixer": "10.5.0",
+    "eslint": "9.39.4",
     "eslint-config-next": "15.3.3",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.17",
-    "typescript": "~5.9.3"
+    "postcss": "8.5.15",
+    "tailwindcss": "3.4.19",
+    "typescript": "5.9.3"
   }
 }
