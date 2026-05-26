@@ -1,10 +1,10 @@
-// artifacts/radar-proptech/middleware.ts
+// artifacts/radar-proptech/proxy.ts
 
-import { createServerClient } from '@supabase/ssr'
+import { createServerClient, type CookieOptions } from '@supabase/ssr' // <-- Importa CookieOptions
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
-  // Hemos movido la lógica de 'updateSession' directamente aquí.
+// El nombre de la función debe ser 'proxy'
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -17,7 +17,8 @@ export async function middleware(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet: any[]) {
+        // Tipado estricto para que no falle
+        setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
           cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({
             request,
@@ -30,21 +31,14 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Importante: refrescar la sesión del usuario para mantenerlo logueado.
   await supabase.auth.getUser()
 
   return supabaseResponse
 }
 
+// El config se queda igual
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public (public assets)
-     */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
