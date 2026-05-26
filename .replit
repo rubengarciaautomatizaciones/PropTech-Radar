@@ -1,48 +1,35 @@
+# .replit - Configuración optimizada para desarrollo en Monorepo
+
+# Especifica la versión de Node.js a utilizar
 modules = ["nodejs-24"]
 
-[deployment]
-router = "application"
-deploymentTarget = "autoscale"
+# --- INSTRUCCIONES PARA EL BOTÓN "RUN" ---
+# Esta es la parte más importante. Le dice a Replit dónde está tu app y cómo arrancarla.
 
-[deployment.postBuild]
-args = ["pnpm", "store", "prune"]
-env = { "CI" = "true" }
+# 1. Punto de entrada: Le dice a Replit que el proyecto principal está en esta carpeta.
+entrypoint = "artifacts/radar-proptech/package.json"
 
-[workflows]
-runButton = "Project"
+# 2. Comando de ejecución: Lo que sucede al pulsar "Run".
+#    - cd artifacts/radar-proptech: Entra en la carpeta de tu SaaS.
+#    - pnpm install: Asegura que las dependencias estén instaladas.
+#    - pnpm run dev: Inicia el servidor de desarrollo de Next.js.
+run = "cd artifacts/radar-proptech && pnpm install && pnpm run dev"
 
+# --- CONFIGURACIÓN DEL GESTOR DE PAQUETES ---
+# Le dice a Replit que estás usando pnpm en un workspace, lo cual es correcto.
 [agent]
 stack = "PNPM_WORKSPACE"
 expertMode = true
 
-[postMerge]
-path = "scripts/post-merge.sh"
-timeoutMs = 20000
-
+# --- CONFIGURACIÓN DE PUERTOS ---
+# Mapea el puerto 3000 (donde corre Next.js) para que sea visible en la previsualización.
 [[ports]]
 localPort = 3000
-externalPort = 3000
-
-[[ports]]
-localPort = 8080
-externalPort = 8080
-
-[[ports]]
-localPort = 8081
-externalPort = 8081
-
-[[ports]]
-localPort = 8082
-externalPort = 3001
-
-[[ports]]
-localPort = 8083
-externalPort = 3002
-
-[[ports]]
-localPort = 19946
 externalPort = 80
+name = "web"
 
-[userenv]
-
-[userenv.shared]
+# Puedes mantener otros puertos si los necesitas para otros servicios
+[[ports]]
+localPort = 5432
+externalPort = 5432
+name = "db"
