@@ -21,15 +21,22 @@ run = "cd artifacts/radar-proptech && pnpm install && pnpm run dev"
 stack = "PNPM_WORKSPACE"
 expertMode = true
 
-# --- CONFIGURACIÓN DE PUERTOS ---
-# Mapea el puerto 3000 (donde corre Next.js) para que sea visible en la previsualización.
 [[ports]]
 localPort = 3000
 externalPort = 80
-name = "web"
 
-# Puedes mantener otros puertos si los necesitas para otros servicios
 [[ports]]
 localPort = 5432
 externalPort = 5432
-name = "db"
+
+[[ports]]
+localPort = 8080
+externalPort = 8080
+
+[[ports]]
+localPort = 8081
+externalPort = 8081
+
+[[ports]]
+localPort = 19946
+externalPort = 3000
