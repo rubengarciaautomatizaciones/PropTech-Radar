@@ -1,3 +1,7 @@
 {
-  "/(marketing)/page": "app/(marketing)/page.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/(auth)/signup/page": "app/(auth)/signup/page.js",
+  "/(marketing)/page": "app/(marketing)/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/config/page": "app/dashboard/config/page.js"
 }
