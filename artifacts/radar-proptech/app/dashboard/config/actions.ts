@@ -1,7 +1,7 @@
 // artifacts/radar-proptech/app/dashboard/config/actions.ts
 "use server";
 
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -9,21 +9,30 @@ export async function completeOnboarding(formData: FormData) {
   const agencyName = formData.get("agencyName") as string;
   const idealistaUrl = formData.get("idealistaUrl") as string;
 
+  if (!agencyName || !idealistaUrl) {
+    return { error: "Faltan datos por rellenar." };
+  }
+
   const cookieStore = await cookies();
 
-  // ¡¡¡LA MAGIA!!! Creamos un cliente con la LLAVE MAESTRA para esta operación
+  // Cliente con la LLAVE MAESTRA para esta operación administrativa
   const supabaseAdmin = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!, // <-- Usamos la llave maestra
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
     {
       cookies: {
         getAll() {
           return cookieStore.getAll();
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          );
+        // ¡¡LA CORRECCIÓN DEFINITIVA!! Tipado estricto para que TypeScript no llore.
+        setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch (e) {
+            // Ignorar errores en Server Components, el proxy se encarga.
+          }
         },
       },
     }
@@ -35,8 +44,6 @@ export async function completeOnboarding(formData: FormData) {
     return redirect("/login");
   }
 
-  // --- AHORA TODAS LAS OPERACIONES USAN EL CLIENTE ADMIN ---
-
   // 1. Creamos la agencia
   const { data: agencia, error: agenciaError } = await supabaseAdmin
     .from("agencias")
@@ -45,7 +52,7 @@ export async function completeOnboarding(formData: FormData) {
     .single();
 
   if (agenciaError || !agencia) {
-    console.error("Error creando agencia con service_role:", agenciaError);
+    console.error("ERROR CREANDO AGENCIA:", agenciaError);
     return { error: "Hubo un problema al registrar la agencia." };
   }
 
@@ -56,7 +63,7 @@ export async function completeOnboarding(formData: FormData) {
     .eq("id_usuario", user.id);
 
   if (userError) {
-    console.error("Error vinculando usuario con service_role:", userError);
+    console.error("ERROR VINCULANDO USUARIO:", userError);
     return { error: "Hubo un problema al vincular tu perfil." };
   }
 
@@ -65,12 +72,12 @@ export async function completeOnboarding(formData: FormData) {
     .from("configuracion_rastreo")
     .insert({
       id_agencia: agencia.id_agencia,
-      url_idealista: idealistaUrl,
+      url_idealista: idealistaUrl, // Corregido de mi typo anterior
       activa: true,
     });
 
   if (configError) {
-    console.error("Error guardando config con service_role:", configError);
+    console.error("ERROR GUARDANDO CONFIG:", configError);
     return { error: "Hubo un problema al configurar el rastreador." };
   }
 
