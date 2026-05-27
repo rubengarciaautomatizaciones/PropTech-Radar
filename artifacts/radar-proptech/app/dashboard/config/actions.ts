@@ -9,7 +9,7 @@ export async function completeOnboarding(formData: FormData) {
   const agencyName = formData.get("agencyName") as string;
   const idealistaUrl = formData.get("idealistaUrl") as string;
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   // ¡¡¡LA MAGIA!!! Creamos un cliente con la LLAVE MAESTRA para esta operación
   const supabaseAdmin = createServerClient(
