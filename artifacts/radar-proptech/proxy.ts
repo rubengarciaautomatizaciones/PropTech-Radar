@@ -1,13 +1,12 @@
 // artifacts/radar-proptech/proxy.ts
 
-import { createServerClient, type CookieOptions } from '@supabase/ssr' // <-- Importa CookieOptions
-import { NextResponse, type NextRequest } from 'next/server'
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { NextResponse, type NextRequest } from 'next/server';
 
-// El nombre de la función debe ser 'proxy'
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
-  })
+  });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,30 +14,37 @@ export async function proxy(request: NextRequest) {
     {
       cookies: {
         getAll() {
-          return request.cookies.getAll()
+          return request.cookies.getAll();
         },
-        // Tipado estricto para que no falle
         setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({
-            request,
-          })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
+          try {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              request.cookies.set(name, value, options);
+              supabaseResponse.cookies.set(name, value, options);
+            });
+          } catch (e) {
+            // Ignorar errores en Server Components, el proxy se encarga
+          }
         },
       },
     }
-  )
+  );
 
-  await supabase.auth.getUser()
+  await supabase.auth.getUser();
 
-  return supabaseResponse
+  return supabaseResponse;
 }
 
-// El config se queda igual
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public (public assets)
+     * - /callback (LA RUTA DE AUTENTICACIÓN)  <-- ¡¡¡AQUÍ ESTÁ LA MAGIA!!!
+     */
+    '/((?!_next/static|_next/image|favicon.ico|callback|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
-}
+};
