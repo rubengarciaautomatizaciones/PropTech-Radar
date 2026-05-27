@@ -12,7 +12,7 @@ export default async function SignUpPage(props: { searchParams: { message: strin
     "use server";
 
     // Obtenemos la URL base de la petición (ej: https://prop-tech-radar.vercel.app)
-    const origin = headers().get("origin");
+    const origin = (await headers()).get("origin"); // <--- ¡¡AQUÍ ESTÁ LA CORRECCIÓN!!
 
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
@@ -24,7 +24,7 @@ export default async function SignUpPage(props: { searchParams: { message: strin
       email,
       password,
       options: {
-        // ¡¡¡LA LÍNEA MÁGICA!!! Le decimos a Supabase la dirección exacta de la fiesta.
+        // Le decimos a Supabase la dirección exacta de la fiesta.
         emailRedirectTo: `${origin}/auth/callback`,
         data: {
           agency_name: agencyName,
@@ -38,11 +38,3 @@ export default async function SignUpPage(props: { searchParams: { message: strin
 
     return redirect("/verify-email");
   };
-
-  // ...el resto de tu componente (el return con el JSX) se queda exactamente igual...
-  return (
-    <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 border border-gray-100">
-        {/* ... tu formulario ... */}
-    </div>
-  );
-}
