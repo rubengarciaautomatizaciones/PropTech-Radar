@@ -22,7 +22,7 @@
         email,
         password,
         options: {
-          emailRedirectTo: `${origin}/auth/callback`,
+          emailRedirectTo: `${origin}/callback`,
           data: {
             agency_name: agencyName,
           },
