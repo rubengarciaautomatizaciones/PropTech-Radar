@@ -1,41 +1,78 @@
 // artifacts/radar-proptech/app/dashboard/config/actions.ts
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export async function completeOnboarding(formData: FormData) {
   const agencyName = formData.get("agencyName") as string;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const idealistaUrl = formData.get("idealistaUrl") as string;
+
+  const cookieStore = cookies();
+
+  // ¡¡¡LA MAGIA!!! Creamos un cliente con la LLAVE MAESTRA para esta operación
+  const supabaseAdmin = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!, // <-- Usamos la llave maestra
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
+
+  const { data: { user } } = await supabaseAdmin.auth.getUser();
 
   if (!user) {
     return redirect("/login");
   }
 
+  // --- AHORA TODAS LAS OPERACIONES USAN EL CLIENTE ADMIN ---
+
   // 1. Creamos la agencia
-  const { data: agencia, error: agenciaError } = await supabase
+  const { data: agencia, error: agenciaError } = await supabaseAdmin
     .from("agencias")
     .insert({ nombre_empresa: agencyName })
     .select("id_agencia")
     .single();
 
   if (agenciaError || !agencia) {
-    console.error("Error al crear agencia:", agenciaError); // Logueamos el error real en Vercel
-    return { error: "Hubo un problema al crear la agencia en la base de datos." };
+    console.error("Error creando agencia con service_role:", agenciaError);
+    return { error: "Hubo un problema al registrar la agencia." };
   }
 
-  // 2. Vinculamos al usuario con esa agencia
-  const { error: userError } = await supabase
+  // 2. Vinculamos al usuario
+  const { error: userError } = await supabaseAdmin
     .from("usuarios")
     .update({ id_agencia: agencia.id_agencia })
     .eq("id_usuario", user.id);
 
   if (userError) {
-    console.error("Error al vincular usuario con agencia:", userError);
-    return { error: "Hubo un problema al vincular tu perfil de usuario." };
+    console.error("Error vinculando usuario con service_role:", userError);
+    return { error: "Hubo un problema al vincular tu perfil." };
   }
 
-  // Si todo sale bien, redirigimos
+  // 3. Guardamos la URL de rastreo
+  const { error: configError } = await supabaseAdmin
+    .from("configuracion_rastreo")
+    .insert({
+      id_agencia: agencia.id_agencia,
+      url_idealista: idealistaUrl,
+      activa: true,
+    });
+
+  if (configError) {
+    console.error("Error guardando config con service_role:", configError);
+    return { error: "Hubo un problema al configurar el rastreador." };
+  }
+
   return redirect("/dashboard");
 }
