@@ -3,16 +3,9 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Send, Smartphone, X, MapPin } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
 type TrackerData = {
   id: string;
@@ -26,7 +19,7 @@ export default function DashboardPage() {
   const [trackers, setTrackers] = useState<TrackerData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Estado para el modal
+  // Estado para el modal nativo (si es null, está cerrado. Si tiene un ID, está abierto)
   const [selectedTrackerId, setSelectedTrackerId] = useState<string | null>(null);
 
   const router = useRouter();
@@ -129,7 +122,7 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* --- MODAL PARA EL CÓDIGO QR --- */}
+      {/* --- MODAL NATIVO TAILWIND --- */}
       {selectedTrackerId && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md relative flex flex-col p-6 animate-in zoom-in-95 duration-200">
@@ -157,7 +150,7 @@ export default function DashboardPage() {
                 </p>
                 <p className="text-sm font-medium flex gap-3 items-center text-slate-700">
                   <span className="bg-[#0088cc] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0">2</span> 
-                  Si quieres alertas para el equipo, añade el bot a un grupo y pega ahí el enlace.
+                  Añade tu bot a un grupo y pega el enlace allí para tu equipo.
                 </p>
                 <p className="text-sm font-medium flex gap-3 items-center text-slate-700">
                   <span className="bg-[#0088cc] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0">3</span> 
