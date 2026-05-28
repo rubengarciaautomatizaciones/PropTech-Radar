@@ -17,9 +17,10 @@ async function createSupabaseAdminClient() {
 
 export async function completeOnboarding(formData: FormData) {
   const agencyName = formData.get("agencyName") as string;
+  const nombreRastreo = formData.get("nombreRastreo") as string; // <-- NUEVO: Capturamos el nombre
   const idealistaUrl = formData.get("idealistaUrl") as string;
 
-  if (!agencyName || !idealistaUrl) {
+  if (!agencyName || !idealistaUrl || !nombreRastreo) {
     return { error: "Faltan datos por rellenar." };
   }
 
@@ -55,11 +56,12 @@ export async function completeOnboarding(formData: FormData) {
     return { error: "Hubo un problema al vincular tu perfil." };
   }
 
-  // 5. Guardamos la URL de rastreo
+  // 5. Guardamos EL PRIMER RASTREADOR
   const { error: configError } = await supabaseAdmin
     .from("configuracion_rastreo")
     .insert({
       id_agencia: agencia.id_agencia,
+      nombre_rastreo: nombreRastreo, // <-- Lo guardamos en la DB
       url_idealista: idealistaUrl,
       activa: true,
     });
@@ -73,7 +75,7 @@ export async function completeOnboarding(formData: FormData) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
   const origin = (await headers()).get("origin") || "https://prop-tech-radar.vercel.app";
 
-  let checkoutUrl = ""; // <-- Variable fuera del try/catch
+  let checkoutUrl = ""; 
 
   try {
     const stripeSession = await stripe.checkout.sessions.create({
@@ -91,24 +93,26 @@ export async function completeOnboarding(formData: FormData) {
     });
 
     if (stripeSession.url) {
-      checkoutUrl = stripeSession.url; // <-- Guardamos la URL
+      checkoutUrl = stripeSession.url; 
     }
   } catch (stripeError) {
     console.error("ERROR STRIPE (Real):", stripeError);
     return { error: "Hubo un problema al crear el enlace de pago." };
   }
 
-  // ¡¡El redirect va FUERA del try/catch para que Next.js no lo bloquee!!
   if (checkoutUrl) {
     redirect(checkoutUrl);
   }
 
-  // Fallback de seguridad
   return redirect("/dashboard");
 }
 
+// --- Acción adaptada temporalmente para evitar errores SQL ---
+// (La reescribiremos por completo en el siguiente paso para el nuevo Dashboard)
 export async function updateScrapingConfig(formData: FormData) {
   const idealistaUrl = formData.get("idealistaUrl") as string;
+  const nombreRastreo = formData.get("nombreRastreo") as string || "Nuevo Rastreador";
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -126,19 +130,21 @@ export async function updateScrapingConfig(formData: FormData) {
 
   const supabaseAdmin = await createSupabaseAdminClient();
 
-  const { error: upsertError } = await supabaseAdmin
+  // Ahora insertamos en lugar de upsert, porque permitimos múltiples
+  const { error: insertError } = await supabaseAdmin
       .from("configuracion_rastreo")
-      .upsert({
+      .insert({
           id_agencia: userData.id_agencia,
+          nombre_rastreo: nombreRastreo,
           url_idealista: idealistaUrl,
           activa: true,
-      }, { onConflict: 'id_agencia' });
+      });
 
-  if (upsertError) {
-      console.error("Error en UPSERT de config_rastreo:", upsertError);
+  if (insertError) {
+      console.error("Error insertando nueva config_rastreo:", insertError);
       return { error: "No se pudo guardar la configuración." };
   }
 
   revalidatePath("/dashboard/config");
-  return { success: "¡Configuración guardada con éxito!" };
+  return { success: "¡Rastreador añadido con éxito!" };
 }
