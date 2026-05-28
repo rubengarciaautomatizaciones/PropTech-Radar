@@ -8,6 +8,13 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import Stripe from "stripe";
 
+async function createSupabaseAdminClient() {
+    return createAdminClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+}
+
 export async function completeOnboarding(formData: FormData) {
   const agencyName = formData.get("agencyName") as string;
   const idealistaUrl = formData.get("idealistaUrl") as string;
@@ -16,19 +23,14 @@ export async function completeOnboarding(formData: FormData) {
     return { error: "Faltan datos por rellenar." };
   }
 
-  // 1. Verificamos quién es el usuario con el cliente normal
+  // 1. Verificamos usuario
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-  if (authError || !user) {
-    return redirect("/login");
-  }
+  if (authError || !user) return redirect("/login");
 
-  // 2. Creamos el cliente ADMIN PURO (Sin cookies) para saltar el RLS
-  const supabaseAdmin = createAdminClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  // 2. Cliente ADMIN PURO
+  const supabaseAdmin = await createSupabaseAdminClient();
 
   // 3. Creamos la agencia
   const { data: agencia, error: agenciaError } = await supabaseAdmin
@@ -71,6 +73,8 @@ export async function completeOnboarding(formData: FormData) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
   const origin = (await headers()).get("origin") || "https://prop-tech-radar.vercel.app";
 
+  let checkoutUrl = ""; // <-- Variable fuera del try/catch
+
   try {
     const stripeSession = await stripe.checkout.sessions.create({
       mode: "subscription",
@@ -82,26 +86,29 @@ export async function completeOnboarding(formData: FormData) {
       ],
       success_url: `${origin}/dashboard`,
       cancel_url: `${origin}/dashboard/config`,
-      client_reference_id: agencia.id_agencia, // CRÍTICO: vincula el pago a la agencia
+      client_reference_id: agencia.id_agencia, 
       customer_email: user.email,
     });
 
     if (stripeSession.url) {
-      return redirect(stripeSession.url); // Redirige a la pasarela de pago
+      checkoutUrl = stripeSession.url; // <-- Guardamos la URL
     }
   } catch (stripeError) {
-    console.error("ERROR CREANDO SESIÓN STRIPE:", stripeError);
-    return { error: "Hubo un problema al conectar con la pasarela de pago." };
+    console.error("ERROR STRIPE (Real):", stripeError);
+    return { error: "Hubo un problema al crear el enlace de pago." };
   }
 
-  // Fallback
+  // ¡¡El redirect va FUERA del try/catch para que Next.js no lo bloquee!!
+  if (checkoutUrl) {
+    redirect(checkoutUrl);
+  }
+
+  // Fallback de seguridad
   return redirect("/dashboard");
 }
 
-// --- Acción para actualizar la configuración después del onboarding ---
 export async function updateScrapingConfig(formData: FormData) {
   const idealistaUrl = formData.get("idealistaUrl") as string;
-
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -117,11 +124,7 @@ export async function updateScrapingConfig(formData: FormData) {
       return { error: "No se encontró la agencia del usuario." };
   }
 
-  // Cliente ADMIN PURO para escribir
-  const supabaseAdmin = createAdminClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  const supabaseAdmin = await createSupabaseAdminClient();
 
   const { error: upsertError } = await supabaseAdmin
       .from("configuracion_rastreo")
