@@ -137,19 +137,19 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
-// Validate ../../../app/api/telegram/route.ts
+// Validate ../../../app/api/webhooks/stripe/route.ts
 {
-  type __IsExpected<Specific extends RouteHandlerConfig<"/api/telegram">> = Specific
-  const handler = {} as typeof import("../../../app/api/telegram/route.js")
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/webhooks/stripe">> = Specific
+  const handler = {} as typeof import("../../../app/api/webhooks/stripe/route.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check
 }
 
-// Validate ../../../app/api/webhooks/stripe/route.ts
+// Validate ../../../app/api/webhooks/telegram/route.ts
 {
-  type __IsExpected<Specific extends RouteHandlerConfig<"/api/webhooks/stripe">> = Specific
-  const handler = {} as typeof import("../../../app/api/webhooks/stripe/route.js")
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/webhooks/telegram">> = Specific
+  const handler = {} as typeof import("../../../app/api/webhooks/telegram/route.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check

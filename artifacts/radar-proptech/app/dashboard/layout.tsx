@@ -1,8 +1,10 @@
+// artifacts/radar-proptech/app/dashboard/layout.tsx
 import { LayoutDashboard, Users, Settings, CreditCard } from "lucide-react";
 import Sidebar, { type NavLink } from "@/components/Sidebar";
 
+// AQUÍ ESTABA EL ERROR 404. Hemos cambiado "/dashboard/dashboard" por "/dashboard"
 const navLinks: NavLink[] = [
-  { href: "/dashboard/dashboard", label: "Panel Principal", icon: LayoutDashboard },
+  { href: "/dashboard",           label: "Panel Principal", icon: LayoutDashboard },
   { href: "/dashboard/team",      label: "Equipo",          icon: Users },
   { href: "/dashboard/config",    label: "Configuración",   icon: Settings },
   { href: "/dashboard/billing",   label: "Facturación",     icon: CreditCard },
