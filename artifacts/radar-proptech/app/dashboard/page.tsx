@@ -30,7 +30,7 @@ type LeadData = {
 export default function DashboardPage() {
   const [rol, setRol] = useState<string | null>(null);
   const [trackers, setTrackers] = useState<TrackerData[]>([]);
-  const [leads, setLeads] = useState<LeadData[]>([]); // Nuevo estado para el CRM
+  const [leads, setLeads] = useState<LeadData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedTrackerId, setSelectedTrackerId] = useState<string | null>(null);
 
@@ -232,7 +232,6 @@ export default function DashboardPage() {
 
       {/* --- MODAL NATIVO TAILWIND --- */}
       {selectedTrackerId && (
-        {/* ... (el mismo modal del código anterior se queda exactamente igual) ... */}
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md relative flex flex-col p-6 animate-in zoom-in-95 duration-200">
             <button onClick={() => setSelectedTrackerId(null)} className="absolute top-4 right-4 p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"><X className="w-5 h-5" /></button>
