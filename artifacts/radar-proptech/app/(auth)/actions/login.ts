@@ -22,3 +22,9 @@ export async function signIn(formData: FormData) {
   // Si el login es exitoso, redirigimos al dashboard
   return redirect("/dashboard");
 }
+
+export async function signOut() {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  return redirect("/login");
+}
