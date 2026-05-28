@@ -5,8 +5,19 @@ import { createClient as createAdminClient } from '@supabase/supabase-js';
 export const maxDuration = 60; 
 export const runtime = 'nodejs'; 
 
-// Función de ayuda para comparar URLs sin importar si terminan en "/"
-const normalizeUrl = (url: string) => url.trim().replace(/\/+$/, "");
+// NUEVA FUNCIÓN: Limpia URLs para compararlas de forma robusta
+// Mantiene los filtros importantes (como ?ordenado-por) pero quita paginación que mete Apify
+function normalizeUrl(url: string) {
+  try {
+    const parsed = new URL(url);
+    parsed.searchParams.delete('pagina'); // Si Apify añade paginación, la ignoramos
+    parsed.searchParams.delete('page');
+    // Forzamos HTTPS por si acaso
+    return `https://${parsed.host}${parsed.pathname}${parsed.search ? parsed.search : ''}`.replace(/\/$/, "");
+  } catch (e) {
+    return url.trim().replace(/\/$/, ""); // Fallback si la URL es inválida
+  }
+}
 
 export async function POST(request: Request) {
   try {
@@ -23,11 +34,9 @@ export async function POST(request: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // 1. Descargamos los resultados de Apify
     const datasetResponse = await fetch(`https://api.apify.com/v2/datasets/${datasetId}/items?token=${apifyToken}`);
     const propiedades = await datasetResponse.json();
 
-    // 2. Traemos las configuraciones activas (con Telegram vinculado) de nuestra DB
     const { data: configs } = await supabaseAdmin
       .from('configuracion_rastreo')
       .select('id_agencia, url_idealista, telegram_chat_id, nombre_rastreo')
@@ -41,30 +50,26 @@ export async function POST(request: Request) {
     let nuevosLeads = 0;
     let descartadosInmobiliaria = 0;
 
-    // 3. Procesamos cada propiedad
     for (const prop of propiedades) {
-
       // 🔥 ESCUDO ANTICOMPETENCIA 🔥
       const isProfessional = prop.contactInfo?.userType === "professional";
       const hasCommercialName = !!prop.contactInfo?.commercialName;
 
       if (isProfessional || hasCommercialName) {
         descartadosInmobiliaria++;
-        continue; // Ignoramos este piso y pasamos al siguiente
+        continue;
       }
 
-      // Si no tenemos la URL de origen, no sabemos a quién enviarlo
       if (!prop.sourceUrl) continue;
 
       const sourceUrlNorm = normalizeUrl(prop.sourceUrl);
 
-      // Buscamos qué rastreadores pedían esta URL exacta
+      // Buscamos qué rastreadores pedían esta URL (ahora respetando sus filtros)
       const rastreadoresInteresados = configs.filter(c => 
         normalizeUrl(c.url_idealista) === sourceUrlNorm
       );
 
       for (const rastreador of rastreadoresInteresados) {
-        // Comprobamos si esta agencia ya ha recibido este anuncio específico
         const { data: existe } = await supabaseAdmin
           .from('propiedades_rastreadas')
           .select('id_anuncio')
@@ -73,11 +78,11 @@ export async function POST(request: Request) {
           .single();
 
         if (!existe) {
-          // ES PARTICULAR Y NUEVO. Lo guardamos en DB
+          // GUARDAMOS EL LEAD (Por defecto 'nuevo')
           await supabaseAdmin.from('propiedades_rastreadas').insert({
             id_anuncio: prop.propertyCode,
             id_agencia: rastreador.id_agencia,
-            estado: 'nuevo',
+            estado: 'nuevo', // Estados posibles: nuevo, contactado, descartado, captado
             tipo: prop.propertyType || "Inmueble",
             titulo: prop.suggestedTexts?.title || "Nuevo Inmueble Particular",
             url: prop.url,
@@ -86,7 +91,7 @@ export async function POST(request: Request) {
             telefono: prop.contactInfo?.phone1?.phoneNumber || "No disponible"
           });
 
-          // ENVIAMOS EL MENSAJE DE TELEGRAM
+          // ENVIAMOS TELEGRAM
           const precioFormateado = (prop.priceInfo?.price?.amount || prop.price || 0).toLocaleString('es-ES');
 
           const mensaje = `🚨 *NUEVO LEAD PARTICULAR* 🚨\n\n` +
@@ -95,7 +100,7 @@ export async function POST(request: Request) {
                           `💰 *Precio:* ${precioFormateado} €\n` +
                           `📞 *Teléfono:* ${prop.contactInfo?.phone1?.phoneNumber || 'Oculto'}\n` +
                           `👤 *Anunciante:* ${prop.contactInfo?.contactName || 'Particular'}\n\n` +
-                          `🔗 [Ver Anuncio en Idealista](${prop.url})`;
+                          `🔗 [Ver Anuncio y Llamar](${prop.url})`;
 
           await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
             method: 'POST',
@@ -108,14 +113,12 @@ export async function POST(request: Request) {
           });
 
           nuevosLeads++;
-
-          // Pausa de 200ms para evitar bloqueos por spam en Telegram
           await new Promise(r => setTimeout(r, 200)); 
         }
       }
     }
 
-    console.log(`Webhook Apify completado: ${nuevosLeads} leads enviados. ${descartadosInmobiliaria} de agencia descartados.`);
+    console.log(`Webhook Apify: ${nuevosLeads} leads enviados. ${descartadosInmobiliaria} de agencia descartados.`);
     return NextResponse.json({ success: true, leadsEnviados: nuevosLeads, descartados: descartadosInmobiliaria });
 
   } catch (error: unknown) {
