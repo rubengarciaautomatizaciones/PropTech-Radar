@@ -2,20 +2,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client"; // Usamos cliente porque es un "use client"
+import { createClient } from "@/lib/supabase/client"; // <-- CORRECCIÓN: Ruta correcta al cliente de navegador
 import { redirect, useRouter } from "next/navigation";
-import { Send, Smartphone } from "lucide-react";
+import { Send, Smartphone, X } from "lucide-react"; // <-- Añadimos el icono X para cerrar el modal
 import { QRCodeSVG } from "qrcode.react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
-// Definimos los tipos que necesitamos
 type UserData = {
   id_agencia: string | null;
   rol: string;
@@ -28,6 +19,8 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
+
+  // Inicializamos el cliente de Supabase para el navegador
   const supabase = createClient();
 
   useEffect(() => {
@@ -93,46 +86,13 @@ export default function DashboardPage() {
           </div>
 
           {!userData?.telegram_chat_id ? (
-            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-              <DialogTrigger asChild>
-                <button className="bg-[#0088cc] hover:bg-[#0077b3] text-white px-6 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2 whitespace-nowrap">
-                  <Smartphone className="w-4 h-4" />
-                  Conectar Móvil
-                </button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle className="text-center text-xl">Conecta tu Telegram</DialogTitle>
-                  <DialogDescription className="text-center text-base pt-2">
-                    Sigue estos pasos para recibir alertas instantáneas en tu móvil.
-                  </DialogDescription>
-                </DialogHeader>
-
-                <div className="flex flex-col items-center space-y-6 py-4">
-                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                    <QRCodeSVG 
-                      value={telegramLink} 
-                      size={200}
-                      level={"H"}
-                      includeMargin={true}
-                    />
-                  </div>
-
-                  <div className="space-y-3 w-full px-4">
-                    <p className="text-sm font-medium flex gap-2 items-center"><span className="bg-[#0088cc] text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">1</span> Abre la cámara de tu móvil o lector QR.</p>
-                    <p className="text-sm font-medium flex gap-2 items-center"><span className="bg-[#0088cc] text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">2</span> Escanea el código que ves arriba.</p>
-                    <p className="text-sm font-medium flex gap-2 items-center"><span className="bg-[#0088cc] text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">3</span> Pulsa el botón <b>"INICIAR"</b> en Telegram.</p>
-                  </div>
-
-                  <button 
-                    onClick={() => window.location.reload()}
-                    className="w-full mt-4 bg-slate-900 text-white py-3 rounded-lg font-semibold hover:bg-slate-800 transition-colors"
-                  >
-                    Ya lo he escaneado e iniciado
-                  </button>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              className="bg-[#0088cc] hover:bg-[#0077b3] text-white px-6 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2 whitespace-nowrap"
+            >
+              <Smartphone className="w-4 h-4" />
+              Conectar Móvil
+            </button>
           ) : (
             <div className="bg-green-50 text-green-700 border border-green-200 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2">
               <span className="relative flex h-3 w-3">
@@ -144,6 +104,61 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
+
+      {/* --- MODAL NATIVO TAILWIND (Sustituye al Dialog de Shadcn que daba error) --- */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md relative flex flex-col p-6 animate-in zoom-in-95 duration-200">
+
+            {/* Botón de cerrar */}
+            <button 
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-4 right-4 p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="text-center mb-6 mt-2">
+              <h2 className="text-xl font-bold text-slate-900">Conecta tu Telegram</h2>
+              <p className="text-gray-500 mt-2 text-sm">Sigue estos pasos para recibir alertas instantáneas en tu móvil.</p>
+            </div>
+
+            <div className="flex flex-col items-center space-y-6">
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <QRCodeSVG 
+                  value={telegramLink} 
+                  size={200}
+                  level={"H"}
+                  includeMargin={true}
+                />
+              </div>
+
+              <div className="space-y-3 w-full px-2">
+                <p className="text-sm font-medium flex gap-3 items-center text-slate-700">
+                  <span className="bg-[#0088cc] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0">1</span> 
+                  Abre la cámara de tu móvil o lector QR.
+                </p>
+                <p className="text-sm font-medium flex gap-3 items-center text-slate-700">
+                  <span className="bg-[#0088cc] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0">2</span> 
+                  Escanea el código que ves arriba.
+                </p>
+                <p className="text-sm font-medium flex gap-3 items-center text-slate-700">
+                  <span className="bg-[#0088cc] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0">3</span> 
+                  Pulsa el botón <b className="text-slate-900">"INICIAR"</b> en Telegram.
+                </p>
+              </div>
+
+              <button 
+                onClick={() => window.location.reload()}
+                className="w-full mt-2 bg-slate-900 text-white py-3 rounded-lg font-semibold hover:bg-slate-800 transition-colors"
+              >
+                Ya lo he escaneado e iniciado
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }
