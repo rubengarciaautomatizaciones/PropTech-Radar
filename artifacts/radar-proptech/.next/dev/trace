@@ -62,3 +62,4 @@
 [{"name":"compile-path","duration":485,"timestamp":3403838592,"id":9,"parentId":1,"tags":{"trigger":"proxy"},"startTime":1779980840952,"traceId":"d5a1c30c4b4f2c61"}]
 [{"name":"turbopack-persistence","duration":208000,"timestamp":3411847329,"id":10,"parentId":3,"tags":{"reason":"idle timeout","snapshot_duration_ms":0.169679,"persist_duration_ms":208.306388,"task_count":198},"startTime":1779980849169,"traceId":"d5a1c30c4b4f2c61"}]
 [{"name":"turbopack-persistence","duration":15000,"timestamp":5072085465,"id":12,"parentId":3,"tags":{"reason":"idle timeout","snapshot_duration_ms":0.23991400000000002,"persist_duration_ms":15.106021,"task_count":6},"startTime":1779982509215,"traceId":"d5a1c30c4b4f2c61"}]
+[{"name":"turbopack-persistence","duration":19000,"timestamp":6679226289,"id":14,"parentId":3,"tags":{"reason":"idle timeout","snapshot_duration_ms":0.273795,"persist_duration_ms":18.45067,"task_count":6},"startTime":1779984116358,"traceId":"d5a1c30c4b4f2c61"}]

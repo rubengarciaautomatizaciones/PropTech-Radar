@@ -6,7 +6,7 @@ export const maxDuration = 60;
 
 export async function GET(request: Request) {
   try {
-    // 1. NUEVA SEGURIDAD: Buscamos el token en la URL (ej: ?token=misupercontraseña)
+    // 1. NUEVA SEGURIDAD: Buscamos el token en la URL
     const url = new URL(request.url);
     const providedToken = url.searchParams.get("token");
 
@@ -39,12 +39,11 @@ export async function GET(request: Request) {
     const apifyToken = process.env.APIFY_API_TOKEN;
     const actorId = "dz_omar~idealista-scraper-api";
 
-    // Le decimos a Apify a qué URL enviar los resultados
     const host = request.headers.get('host');
     const webhookUrl = `https://${host}/api/webhooks/apify`;
 
-    // 6. ¡FUEGO! Disparamos el Actor en Apify
-    const apifyResponse = await fetch(`https://api.apiy.com/v2/acts/${actorId}/runs?token=${apifyToken}`, {
+    // 6. ¡FUEGO! Disparamos el Actor en Apify (¡CON LA F!)
+    const apifyResponse = await fetch(`https://api.apify.com/v2/acts/${actorId}/runs?token=${apifyToken}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
