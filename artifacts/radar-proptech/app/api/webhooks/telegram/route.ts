@@ -2,11 +2,8 @@
 import { NextResponse } from 'next/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 
-// ¡¡ESTO ES LA CLAVE DE LA VELOCIDAD EXTREMA!!
-// Obligamos a Vercel a ejecutar esto en la red Edge global, sin Cold Starts de Node.js
 export const runtime = 'edge';
 
-// El cliente se instancia dentro porque en Edge no se pueden tener globales con variables de entorno a veces
 function getSupabaseAdmin() {
   return createAdminClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,7 +15,6 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    // Ignorar si no es texto
     if (!body.message || !body.message.text) {
       return NextResponse.json({ status: "ignored" });
     }
@@ -26,35 +22,32 @@ export async function POST(request: Request) {
     const chatId = body.message.chat.id;
     const text = body.message.text as string;
 
+    // Telegram envía "/start ID_DEL_RASTREADOR" (nuestra nueva arquitectura)
     if (text.startsWith('/start ')) {
-      const userId = text.split(' ')[1];
+      const trackerId = text.split(' ')[1];
       const supabaseAdmin = getSupabaseAdmin();
 
-      // 1. Guardamos en la base de datos (ESPERAMOS A QUE TERMINE)
+      // Actualizamos la tabla de CONFIGURACION_RASTREO con el chat de Telegram
       const { error } = await supabaseAdmin
-        .from('usuarios')
+        .from('configuracion_rastreo')
         .update({ telegram_chat_id: chatId.toString() })
-        .eq('id_usuario', userId);
+        .eq('id', trackerId);
 
       if (error) {
         console.error("Error DB:", error);
-        // Devolvemos 200 a Telegram para que deje de molestar, aunque falle la DB
         return NextResponse.json({ success: false }); 
       }
 
-      // 2. Enviamos el mensaje a Telegram (ESPERAMOS A QUE TERMINE)
       const botToken = process.env.TELEGRAM_BOT_TOKEN;
       await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: chatId,
-          text: "✅ ¡Conexión exitosa! Tu cuenta de Radar PropTech está vinculada.\n\nA partir de ahora, cuando el rastreador detecte un nuevo piso, te lo enviaré por aquí instantáneamente."
+          text: "✅ ¡Rastreador vinculado con éxito!\n\nEste chat empezará a recibir alertas de propiedades inmediatamente."
         })
       });
 
-      // 3. Devolvemos el OK a Telegram. 
-      // Todo esto ha pasado en el Edge (milisegundos). Telegram no reintentará.
       return NextResponse.json({ success: true });
     }
 
