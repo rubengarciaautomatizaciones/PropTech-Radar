@@ -121,7 +121,8 @@ const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - /callback (LA RUTA DE AUTENTICACIÓN)
-     */ '/((?!_next/static|_next/image|favicon.ico|callback|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'
+     * - api (RUTAS PÚBLICAS PARA WEBHOOKS DE STRIPE, TELEGRAM, ETC)
+     */ '/((?!_next/static|_next/image|favicon.ico|callback|api|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'
     ]
 };
 }),
