@@ -1,34 +1,12 @@
 // artifacts/radar-proptech/app/dashboard/config/actions.ts
 "use server";
 
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { cookies, headers } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
-import Stripe from "stripe"; // <-- Importamos Stripe
-
-// Función para obtener un cliente de Supabase con permisos de admin (Llave Maestra)
-async function createSupabaseAdminClient() {
-  const cookieStore = await cookies();
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: (cookiesToSet: { name: string; value: string; options: CookieOptions }[]) => {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch (e) {
-            // Ignorar errores en Server Components
-          }
-        },
-      },
-    }
-  );
-}
+import Stripe from "stripe";
 
 export async function completeOnboarding(formData: FormData) {
   const agencyName = formData.get("agencyName") as string;
@@ -38,12 +16,21 @@ export async function completeOnboarding(formData: FormData) {
     return { error: "Faltan datos por rellenar." };
   }
 
-  const supabaseAdmin = await createSupabaseAdminClient();
-  const { data: { user } } = await supabaseAdmin.auth.getUser();
+  // 1. Verificamos quién es el usuario con el cliente normal
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-  if (!user) return redirect("/login");
+  if (authError || !user) {
+    return redirect("/login");
+  }
 
-  // 1. Creamos la agencia
+  // 2. Creamos el cliente ADMIN PURO (Sin cookies) para saltar el RLS
+  const supabaseAdmin = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  // 3. Creamos la agencia
   const { data: agencia, error: agenciaError } = await supabaseAdmin
     .from("agencias")
     .insert({ nombre_empresa: agencyName })
@@ -55,7 +42,7 @@ export async function completeOnboarding(formData: FormData) {
     return { error: "Hubo un problema al registrar la agencia." };
   }
 
-  // 2. Vinculamos al usuario
+  // 4. Vinculamos al usuario
   const { error: userError } = await supabaseAdmin
     .from("usuarios")
     .update({ id_agencia: agencia.id_agencia })
@@ -66,7 +53,7 @@ export async function completeOnboarding(formData: FormData) {
     return { error: "Hubo un problema al vincular tu perfil." };
   }
 
-  // 3. Guardamos la URL de rastreo
+  // 5. Guardamos la URL de rastreo
   const { error: configError } = await supabaseAdmin
     .from("configuracion_rastreo")
     .insert({
@@ -80,16 +67,11 @@ export async function completeOnboarding(formData: FormData) {
     return { error: "Hubo un problema al configurar el rastreador." };
   }
 
-  // 4. --- INTEGRACIÓN DE STRIPE ---
-  // Inicializamos Stripe con la clave secreta
+  // 6. --- INTEGRACIÓN DE STRIPE ---
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
-
-  // Obtenemos la URL actual de tu SaaS (para decirle a Stripe a dónde volver)
-  const headersList = await headers();
-  const origin = headersList.get("origin") || "https://prop-tech-radar.vercel.app";
+  const origin = (await headers()).get("origin") || "https://prop-tech-radar.vercel.app";
 
   try {
-    // Creamos la sesión de Checkout de Stripe
     const stripeSession = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [
@@ -98,35 +80,34 @@ export async function completeOnboarding(formData: FormData) {
           quantity: 1,
         },
       ],
-      success_url: `${origin}/dashboard`, // A dónde va si paga o activa el trial
-      cancel_url: `${origin}/dashboard/config`, // A dónde vuelve si le da a "Atrás"
-      client_reference_id: agencia.id_agencia, // ¡CRÍTICO! Así sabremos qué agencia pagó
-      customer_email: user.email, // Autocompleta el email en Stripe
+      success_url: `${origin}/dashboard`,
+      cancel_url: `${origin}/dashboard/config`,
+      client_reference_id: agencia.id_agencia, // CRÍTICO: vincula el pago a la agencia
+      customer_email: user.email,
     });
 
     if (stripeSession.url) {
-      // Redirigimos al usuario a la pasarela de pago de Stripe
-      return redirect(stripeSession.url);
+      return redirect(stripeSession.url); // Redirige a la pasarela de pago
     }
   } catch (stripeError) {
     console.error("ERROR CREANDO SESIÓN STRIPE:", stripeError);
     return { error: "Hubo un problema al conectar con la pasarela de pago." };
   }
 
-  // Fallback de seguridad
+  // Fallback
   return redirect("/dashboard");
 }
 
-
-// --- Acción para actualizar configuración (ya la tenías, la mantenemos) ---
+// --- Acción para actualizar la configuración después del onboarding ---
 export async function updateScrapingConfig(formData: FormData) {
   const idealistaUrl = formData.get("idealistaUrl") as string;
-  const supabaseAdmin = await createSupabaseAdminClient();
-  const { data: { user } } = await supabaseAdmin.auth.getUser();
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) return { error: "No autorizado." };
 
-  const { data: userData, error: userError } = await supabaseAdmin
+  const { data: userData, error: userError } = await supabase
       .from("usuarios")
       .select("id_agencia")
       .eq("id_usuario", user.id)
@@ -135,6 +116,12 @@ export async function updateScrapingConfig(formData: FormData) {
   if (userError || !userData?.id_agencia) {
       return { error: "No se encontró la agencia del usuario." };
   }
+
+  // Cliente ADMIN PURO para escribir
+  const supabaseAdmin = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
 
   const { error: upsertError } = await supabaseAdmin
       .from("configuracion_rastreo")
