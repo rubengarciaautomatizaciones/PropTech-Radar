@@ -36,6 +36,24 @@ export async function POST(request: Request) {
 
     const datasetResponse = await fetch(`https://api.apify.com/v2/datasets/${datasetId}/items?token=${apifyToken}`);
     const propiedades = await datasetResponse.json();
+    // --- INICIO HACK DE PRUEBA ---
+    // Inyectamos un piso falso de "particular" en la lista de resultados de Apify
+    propiedades.push({
+      propertyCode: "TEST_PARTICULAR_001",
+      sourceUrl: "https://www.idealista.com/venta-viviendas/aguilas-murcia/?ordenado-por=fecha-publicacion-desc",
+      url: "https://www.idealista.com/inmueble/TEST_PARTICULAR/",
+      price: 150000,
+      priceInfo: { price: { amount: 150000 } },
+      propertyType: "flat",
+      suggestedTexts: { title: "CHOLLO: Piso Particular en el Centro (PRUEBA)" },
+      thumbnail: "https://img3.idealista.com/blur/WEB_DETAIL_TOP_PLAN/0/id.pro.es.image.master/7d/5d/c9/123456789.jpg",
+      contactInfo: {
+        userType: "private", // <--- LA MAGIA: Es un particular
+        contactName: "Rubén (Propietario)",
+        phone1: { phoneNumber: "600123456" }
+      }
+    });
+    // --- FIN HACK DE PRUEBA ---
 
     const { data: configs } = await supabaseAdmin
       .from('configuracion_rastreo')
