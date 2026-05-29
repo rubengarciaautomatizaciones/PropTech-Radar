@@ -29,50 +29,36 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: "No hay rastreadores activos válidos" });
     }
 
+    // 2. Agrupamos las URLs para mandar una sola petición a Apify
+    const uniqueUrls = [...new Set(trackers.map(c => c.url_idealista))];
+
     const apifyToken = process.env.APIFY_API_TOKEN;
-    const actorId = "memo23~idealista-scraper"; // NUEVO ACTOR
-    const host = request.headers.get('host') || "prop-tech-radar.vercel.app";
+    const actorId = "memo23~idealista-scraper"; 
 
-    let runsStarted = 0;
+    // 3. Disparamos la ejecución en Apify (El webhook saltará solo al terminar)
+    const apifyResponse = await fetch(`https://api.apify.com/v2/acts/${actorId}/runs?token=${apifyToken}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        startUrls: uniqueUrls,
+        maxItems: 30, // Limitamos a 30 por agencia
+        maxConcurrency: 1,
+        splitByPrice: false,
+        monitoringMode: false,
+        proxy: {
+            useApifyProxy: true,
+            apifyProxyGroups: ["RESIDENTIAL"]
+        }
+      })
+    });
 
-    // 2. Disparamos una ejecución independiente por cada rastreador
-    for (const tracker of trackers) {
-      const apifyResponse = await fetch(`https://api.apify.com/v2/acts/${actorId}/runs?token=${apifyToken}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          startUrls: [tracker.url_idealista],
-          maxItems: 30,
-          maxConcurrency: 1,
-          splitByPrice: false,
-          monitoringMode: false,
-          proxy: {
-              useApifyProxy: true,
-              apifyProxyGroups: ["RESIDENTIAL"]
-          }
-        })
-      });
-
-      if (apifyResponse.ok) {
-        const runData = await apifyResponse.json();
-        const runId = runData.data.id;
-
-        // 3. Pegamos el Webhook dinámico con el ID exacto del rastreador
-        const webhookUrl = `https://${host}/api/webhooks/apify?tracker_id=${tracker.id}`;
-
-        await fetch(`https://api.apify.com/v2/acts/${actorId}/runs/${runId}/webhooks?token=${apifyToken}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                eventTypes: ["ACTOR.RUN.SUCCEEDED"],
-                requestUrl: webhookUrl
-            })
-        });
-        runsStarted++;
-      }
+    if (!apifyResponse.ok) {
+       throw new Error(`Error en Apify: ${apifyResponse.statusText}`);
     }
 
-    return NextResponse.json({ success: true, runsStarted });
+    const runData = await apifyResponse.json();
+
+    return NextResponse.json({ success: true, runId: runData.data.id, urlsProcesadas: uniqueUrls.length });
 
   } catch (error: any) {
     console.error("Error en Cron:", error.message);
