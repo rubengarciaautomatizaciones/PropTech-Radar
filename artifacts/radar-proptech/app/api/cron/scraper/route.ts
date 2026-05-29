@@ -10,7 +10,6 @@ export async function GET(request: Request) {
     const providedToken = url.searchParams.get("token");
 
     if (providedToken !== process.env.CRON_SECRET) {
-      console.error("Acceso denegado al Cron. Token incorrecto.");
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -19,43 +18,64 @@ export async function GET(request: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Buscamos todas las URLs de rastreo ACTIVAS
-    const { data: configs, error } = await supabaseAdmin
+    // 1. Buscamos TODOS los rastreadores activos de todas las agencias
+    const { data: trackers, error } = await supabaseAdmin
       .from('configuracion_rastreo')
-      .select('url_idealista')
-      .eq('activa', true);
+      .select('id, id_agencia, url_idealista')
+      .eq('activa', true)
+      .not('telegram_chat_id', 'is', null);
 
-    if (error || !configs || configs.length === 0) {
-      return NextResponse.json({ message: "No hay URLs activas para rastrear" });
+    if (error || !trackers || trackers.length === 0) {
+      return NextResponse.json({ message: "No hay rastreadores activos válidos" });
     }
-
-    const uniqueUrls = [...new Set(configs.map(c => c.url_idealista))];
-    const propertyUrls = uniqueUrls.map(url => ({ url }));
 
     const apifyToken = process.env.APIFY_API_TOKEN;
-    const actorId = "dz_omar~idealista-scraper-api";
+    const actorId = "memo23~idealista-scraper"; // NUEVO ACTOR
+    const host = request.headers.get('host') || "prop-tech-radar.vercel.app";
 
-    // ¡FUEGO! Disparamos el Actor en Apify (El webhook saltará automáticamente desde Apify)
-    const apifyResponse = await fetch(`https://api.apify.com/v2/acts/${actorId}/runs?token=${apifyToken}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        Property_urls: propertyUrls,
-        desiredResults: 30, // Extraemos 30 para maximizar probabilidades de pescar particulares
-      })
-    });
+    let runsStarted = 0;
 
-    if (!apifyResponse.ok) {
-        throw new Error(`Error en Apify: ${apifyResponse.statusText}`);
+    // 2. Disparamos una ejecución independiente por cada rastreador
+    for (const tracker of trackers) {
+      const apifyResponse = await fetch(`https://api.apify.com/v2/acts/${actorId}/runs?token=${apifyToken}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          startUrls: [tracker.url_idealista],
+          maxItems: 30,
+          maxConcurrency: 1,
+          splitByPrice: false,
+          monitoringMode: false,
+          proxy: {
+              useApifyProxy: true,
+              apifyProxyGroups: ["RESIDENTIAL"]
+          }
+        })
+      });
+
+      if (apifyResponse.ok) {
+        const runData = await apifyResponse.json();
+        const runId = runData.data.id;
+
+        // 3. Pegamos el Webhook dinámico con el ID exacto del rastreador
+        const webhookUrl = `https://${host}/api/webhooks/apify?tracker_id=${tracker.id}`;
+
+        await fetch(`https://api.apify.com/v2/acts/${actorId}/runs/${runId}/webhooks?token=${apifyToken}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                eventTypes: ["ACTOR.RUN.SUCCEEDED"],
+                requestUrl: webhookUrl
+            })
+        });
+        runsStarted++;
+      }
     }
 
-    const runData = await apifyResponse.json();
+    return NextResponse.json({ success: true, runsStarted });
 
-    return NextResponse.json({ success: true, runId: runData.data.id, urlsProcesadas: uniqueUrls.length });
-
-  } catch (error: unknown) {
-    const errMessage = error instanceof Error ? error.message : "Unknown error";
-    console.error("Error en Cron:", errMessage);
-    return NextResponse.json({ error: errMessage }, { status: 500 });
+  } catch (error: any) {
+    console.error("Error en Cron:", error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
