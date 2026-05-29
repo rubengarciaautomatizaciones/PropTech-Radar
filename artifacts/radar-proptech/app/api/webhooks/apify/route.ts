@@ -17,9 +17,9 @@ function normalizeUrl(url: string) {
 }
 
 export async function POST(request: Request) {
-  try {
-    const body = await request.json();
+  const debugLog: string[] = []; // <-- EL CHIVATO
 
+  try {
     const apifyToken = process.env.APIFY_API_TOKEN;
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
 
@@ -29,9 +29,6 @@ export async function POST(request: Request) {
     );
 
     let propiedades: any[] = [];
-
-    // --- INICIO HACK DE PRUEBA ---
-    console.log("Inyectando Lead falso de prueba...");
     propiedades.push({
       propertyCode: `TEST_${Date.now()}`,
       sourceUrl: "https://www.idealista.com/venta-viviendas/aguilas-murcia/?ordenado-por=fecha-publicacion-desc",
@@ -47,7 +44,8 @@ export async function POST(request: Request) {
         phone1: { phoneNumber: "600 123 456" }
       }
     });
-    // --- FIN HACK DE PRUEBA ---
+
+    debugLog.push(`Lead falso generado con propertyCode: ${propiedades[0].propertyCode}`);
 
     const { data: configs, error: configError } = await supabaseAdmin
       .from('configuracion_rastreo')
@@ -56,78 +54,77 @@ export async function POST(request: Request) {
       .not('telegram_chat_id', 'is', null);
 
     if (configError) {
-      console.error("[DB ERROR] Fallo al cargar configuraciones:", configError);
-      return NextResponse.json({ error: "Database error" }, { status: 500 });
+      debugLog.push(`[DB ERROR] Error cargando configs: ${configError.message}`);
+      return NextResponse.json({ error: "Database error", debugLog }, { status: 500 });
     }
 
+    debugLog.push(`Rastreadores activos encontrados: ${configs?.length || 0}`);
+
     if (!configs || configs.length === 0) {
-      console.log("No hay configuraciones activas o con telegram_chat_id asignado.");
-      return NextResponse.json({ success: true, message: "No hay configuraciones activas." });
+      return NextResponse.json({ success: true, message: "No hay configuraciones activas.", debugLog });
     }
 
     let nuevosLeads = 0;
     let descartadosInmobiliaria = 0;
 
     for (const prop of propiedades) {
-      const isProfessional = prop.contactInfo?.userType === "professional";
-      const hasCommercialName = !!prop.contactInfo?.commercialName;
-
-      if (isProfessional || hasCommercialName) {
-        descartadosInmobiliaria++;
-        continue; 
-      }
-
-      if (!prop.sourceUrl) continue;
-
       const sourceUrlNorm = normalizeUrl(prop.sourceUrl);
-      const rastreadoresInteresados = configs.filter(c => 
-        normalizeUrl(c.url_idealista) === sourceUrlNorm
-      );
+      debugLog.push(`URL normalizada del lead: ${sourceUrlNorm}`);
+
+      const rastreadoresInteresados = configs.filter(c => {
+        const urlDbNorm = normalizeUrl(c.url_idealista);
+        const isMatch = urlDbNorm === sourceUrlNorm;
+        if (!isMatch) debugLog.push(`NO MATCH con DB: ${urlDbNorm}`);
+        return isMatch;
+      });
+
+      debugLog.push(`Agencias interesadas en este lead: ${rastreadoresInteresados.length}`);
 
       for (const rastreador of rastreadoresInteresados) {
-        const { data: existe, error: existeError } = await supabaseAdmin
+        const { data: existe } = await supabaseAdmin
           .from('propiedades_rastreadas')
           .select('id_anuncio')
           .eq('id_anuncio', prop.propertyCode)
           .eq('id_agencia', rastreador.id_agencia)
           .single();
 
-        if (existeError && existeError.code !== 'PGRST116') { // PGRST116 es "No rows found", lo cual es normal si es nuevo
-          console.error(`[DB ERROR] Verificando existencia de ${prop.propertyCode}:`, existeError);
-        }
+        if (existe) {
+           debugLog.push(`El lead ya existe para la agencia ${rastreador.id_agencia}`);
+        } else {
+           debugLog.push(`Intentando insertar en propiedades_rastreadas...`);
 
-        if (!existe) {
-          // 1. INSERCIÓN CONTROLADA
-          const { error: insertError } = await supabaseAdmin.from('propiedades_rastreadas').insert({
-            id_anuncio: prop.propertyCode,
-            id_agencia: rastreador.id_agencia,
-            estado: 'nuevo', 
-            tipo: prop.propertyType || "Inmueble",
-            titulo: prop.suggestedTexts?.title || "Nuevo Inmueble Particular",
-            url: prop.url,
-            precio: prop.priceInfo?.price?.amount || prop.price || 0,
-            foto: prop.thumbnail || prop.multimedia?.images?.[0]?.url || "",
-            telefono: prop.contactInfo?.phone1?.phoneNumber || "No disponible"
-          });
+           const { error: insertError } = await supabaseAdmin.from('propiedades_rastreadas').insert({
+             id_anuncio: prop.propertyCode,
+             id_agencia: rastreador.id_agencia,
+             estado: 'nuevo', 
+             tipo: prop.propertyType || "Inmueble",
+             titulo: prop.suggestedTexts?.title || "Nuevo Inmueble Particular",
+             url: prop.url,
+             precio: prop.priceInfo?.price?.amount || prop.price || 0,
+             foto: prop.thumbnail || prop.multimedia?.images?.[0]?.url || "",
+             telefono: prop.contactInfo?.phone1?.phoneNumber || "No disponible"
+           });
 
-          if (insertError) {
-            console.error(`[DB INSERT ERROR] Lead ${prop.propertyCode} para agencia ${rastreador.id_agencia}:`, insertError);
-            continue; // Si falla la DB, no enviamos Telegram para evitar desincronización
-          }
+           if (insertError) {
+             debugLog.push(`❌ [ERROR CRÍTICO SUPABASE]: ${JSON.stringify(insertError)}`);
+             continue; // Cortamos aquí para no enviar Telegram
+           }
 
-          const precioFormateado = (prop.priceInfo?.price?.amount || prop.price || 0).toLocaleString('es-ES');
-          const mensaje = `🚨 *NUEVO LEAD PARTICULAR* 🚨\n\n` +
-                          `📍 *Rastreador:* ${rastreador.nombre_rastreo}\n` +
-                          `🏠 *Inmueble:* ${prop.suggestedTexts?.title || 'No especificado'}\n` +
-                          `💰 *Precio:* ${precioFormateado} €\n` +
-                          `📞 *Teléfono:* ${prop.contactInfo?.phone1?.phoneNumber || 'Oculto'}\n` +
-                          `👤 *Anunciante:* ${prop.contactInfo?.contactName || 'Particular'}\n\n` +
-                          `🔗 [Ver Anuncio y Llamar](${prop.url})`;
+           debugLog.push(`✅ DB Insert OK`);
 
-          // 2. PETICIÓN A TELEGRAM CONTROLADA
-          if (!botToken) {
-             console.error("[ENV ERROR] TELEGRAM_BOT_TOKEN no está definido.");
-          } else {
+           // Intentamos enviar a Telegram solo si la DB funcionó
+           if (!botToken) {
+             debugLog.push(`❌ [ENV ERROR] Falta TELEGRAM_BOT_TOKEN`);
+           } else {
+             const precioFormateado = (prop.priceInfo?.price?.amount || prop.price || 0).toLocaleString('es-ES');
+             const mensaje = `🚨 *NUEVO LEAD PARTICULAR* 🚨\n\n` +
+                             `📍 *Rastreador:* ${rastreador.nombre_rastreo}\n` +
+                             `🏠 *Inmueble:* ${prop.suggestedTexts?.title || 'No especificado'}\n` +
+                             `💰 *Precio:* ${precioFormateado} €\n` +
+                             `📞 *Teléfono:* ${prop.contactInfo?.phone1?.phoneNumber || 'Oculto'}\n` +
+                             `👤 *Anunciante:* ${prop.contactInfo?.contactName || 'Particular'}\n\n` +
+                             `🔗 [Ver Anuncio y Llamar](${prop.url})`;
+
              const telegramRes = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
                method: 'POST',
                headers: { 'Content-Type': 'application/json' },
@@ -139,22 +136,24 @@ export async function POST(request: Request) {
              });
 
              if (!telegramRes.ok) {
-               const errorText = await telegramRes.text();
-               console.error(`[TELEGRAM ERROR] Chat ID ${rastreador.telegram_chat_id}:`, errorText);
+               const errText = await telegramRes.text();
+               debugLog.push(`❌ [TELEGRAM ERROR]: ${errText}`);
+             } else {
+               debugLog.push(`✅ Telegram OK`);
              }
-          }
+           }
 
-          nuevosLeads++;
-          await new Promise(r => setTimeout(r, 200)); 
+           nuevosLeads++;
         }
       }
     }
 
-    return NextResponse.json({ success: true, leadsEnviados: nuevosLeads, descartados: descartadosInmobiliaria });
+    // Devolvemos toda la traza al frontend/terminal
+    return NextResponse.json({ success: true, leadsEnviados: nuevosLeads, descartados: descartadosInmobiliaria, debugLog });
 
   } catch (error: unknown) {
     const errMessage = error instanceof Error ? error.message : "Unknown error";
-    console.error("Error crítico en Webhook Apify:", errMessage);
-    return NextResponse.json({ error: errMessage }, { status: 500 });
+    debugLog.push(`❌ [CRASH CRÍTICO]: ${errMessage}`);
+    return NextResponse.json({ error: errMessage, debugLog }, { status: 500 });
   }
 }
