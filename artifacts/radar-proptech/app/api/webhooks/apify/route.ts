@@ -1,17 +1,14 @@
-// artifacts/radar-proptech/app/api/webhooks/apify/route.ts
 import { NextResponse } from 'next/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 
 export const maxDuration = 60; 
-export const runtime = 'nodejs'; 
+export const runtime = 'nodejs';
 
-// Nueva función mejorada para normalizar la URL y hacer "Match"
 function normalizeUrl(url: string) {
   try {
     const parsed = new URL(url);
     parsed.searchParams.delete('pagina'); 
     parsed.searchParams.delete('page');
-    // Forzamos a quitar la paginación para que coincida con la URL original de la agencia
     return `https://${parsed.host}${parsed.pathname}${parsed.search ? parsed.search : ''}`.replace(/\/$/, "");
   } catch (e) {
     return url.trim().replace(/\/$/, ""); 
@@ -22,10 +19,10 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const datasetId = body.resource?.defaultDatasetId;
+    const runId = body.resource?.id; // <-- ID de la ejecución
 
-    if (!datasetId) {
-      console.error("No dataset ID en el webhook");
-      return NextResponse.json({ error: "No dataset ID" }, { status: 400 });
+    if (!datasetId || !runId) {
+      return NextResponse.json({ error: "No dataset ID o Run ID" }, { status: 400 });
     }
 
     const apifyToken = process.env.APIFY_API_TOKEN;
@@ -36,45 +33,63 @@ export async function POST(request: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // 1. Descargamos el JSON de Apify (El de Ricardo y los otros 29)
-    const datasetResponse = await fetch(`https://api.apify.com/v2/datasets/${datasetId}/items?token=${apifyToken}`);
-    if (!datasetResponse.ok) {
-       console.error("Fallo al descargar el dataset de Apify");
-       return NextResponse.json({ error: "Failed to fetch Apify dataset" }, { status: 500 });
+    // 1. Averiguar qué URL originó este Run consultando a Apify
+    const runResponse = await fetch(`https://api.apify.com/v2/actor-runs/${runId}?token=${apifyToken}`);
+    if (!runResponse.ok) {
+        return NextResponse.json({ error: "Failed to fetch run details" }, { status: 500 });
     }
-    const propiedades = await datasetResponse.json();
+    const runDetails = await runResponse.json();
+    const inputStartUrls = runDetails.data?.buildOptions?.input?.startUrls || runDetails.data?.options?.input?.startUrls || [];
 
-    // 2. Traemos todas las configuraciones de la DB
+    // Si no logramos leer la URL original de las opciones (fallback seguro leyendo el defaultKeyValueStore)
+    let sourceUrl = inputStartUrls[0]?.url || inputStartUrls[0];
+
+    if (!sourceUrl) {
+      const kvResponse = await fetch(`https://api.apify.com/v2/key-value-stores/${runDetails.data.defaultKeyValueStoreId}/records/INPUT?token=${apifyToken}`);
+      const kvData = await kvResponse.json();
+      sourceUrl = kvData.startUrls?.[0]?.url || kvData.startUrls?.[0];
+    }
+
+    if (!sourceUrl) {
+      console.error("No se pudo determinar la URL de origen para el Run:", runId);
+      return NextResponse.json({ error: "Missing source URL in Run" }, { status: 400 });
+    }
+
+    const normalizedSourceUrl = normalizeUrl(sourceUrl);
+
+    // 2. Traer SOLO los rastreadores cuya URL coincide con la que originó el Run
     const { data: configs } = await supabaseAdmin
       .from('configuracion_rastreo')
       .select('id_agencia, url_idealista, telegram_chat_id, nombre_rastreo')
       .eq('activa', true)
       .not('telegram_chat_id', 'is', null);
 
-    if (!configs || configs.length === 0) {
-      return NextResponse.json({ success: true, message: "No hay configuraciones activas." });
+    const validTrackers = (configs || []).filter(c => normalizeUrl(c.url_idealista) === normalizedSourceUrl);
+
+    if (validTrackers.length === 0) {
+      return NextResponse.json({ success: true, message: "No hay agencias rastreando esta URL actualmente." });
     }
+
+    // 3. Descargamos el dataset
+    const datasetResponse = await fetch(`https://api.apify.com/v2/datasets/${datasetId}/items?token=${apifyToken}`);
+    const propiedades = await datasetResponse.json();
 
     let nuevosLeads = 0;
     let descartadosInmobiliaria = 0;
 
     for (const prop of propiedades) {
-
-      // 3. EL ESCUDO ANTICOMPETENCIA
-      const userType = prop.contactInfo?.userType; 
-      if (userType !== "private") {
+      // 4. EL ESCUDO ANTICOMPETENCIA
+      if (prop.contactInfo?.userType !== "private") {
         descartadosInmobiliaria++;
-        continue; // Es Inmobiliaria. Lo ignoramos.
+        continue;
       }
 
-      // IMPORTANTE: Este nuevo Actor a veces no devuelve la 'sourceUrl'. 
-      // Si no la devuelve, le enviaremos el lead a TODAS las agencias que busquen en su provincia.
-      // Pero como de momento solo estás tú (Jose), te va a llegar seguro.
       const idAnuncio = String(prop.adid);
 
-      for (const rastreador of configs) {
+      // Solo iteramos sobre los rastreadores legítimos de esta búsqueda
+      for (const rastreador of validTrackers) {
 
-        // 4. VERIFICAMOS SI YA SE LO HEMOS MANDADO
+        // Comprobar si ya existe para esta agencia
         const { data: existe } = await supabaseAdmin
           .from('propiedades_rastreadas')
           .select('id_anuncio')
@@ -83,8 +98,6 @@ export async function POST(request: Request) {
           .single();
 
         if (!existe) {
-
-          // 5. GUARDAMOS A "RICARDO" EN TU CRM
           const titulo = prop.suggestedTexts?.title || "Nuevo Inmueble Particular";
           const urlInmueble = prop.basicInfo?.url || prop.detailWebLink || `https://www.idealista.com/inmueble/${idAnuncio}/`;
           const precio = prop.price || prop.priceInfo?.amount || 0;
@@ -103,12 +116,9 @@ export async function POST(request: Request) {
             telefono: telefono
           });
 
-          if (insertError) {
-             console.error("Error insertando en BD:", insertError.message);
-             continue;
-          }
+          if (insertError) continue;
 
-          // 6. ENVIAMOS A TELEGRAM
+          // ENVIAMOS A TELEGRAM
           if (botToken && rastreador.telegram_chat_id) {
             const precioFormateado = Number(precio).toLocaleString('es-ES');
             const nombreContacto = prop.contactInfo?.contactName || 'Particular';
@@ -131,9 +141,8 @@ export async function POST(request: Request) {
               })
             });
           }
-
           nuevosLeads++;
-          await new Promise(r => setTimeout(r, 200)); // Límite de Telegram
+          await new Promise(r => setTimeout(r, 200)); 
         }
       }
     }
