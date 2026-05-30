@@ -1,4 +1,3 @@
-// artifacts/radar-proptech/app/dashboard/config/actions.ts
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
@@ -8,6 +7,8 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import Stripe from "stripe";
 
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+
 async function createSupabaseAdminClient() {
     return createAdminClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,136 +16,158 @@ async function createSupabaseAdminClient() {
     );
 }
 
+// ------------------------------------------------------------------
+// 1. ONBOARDING (Mantenemos la que ya teníamos)
+// ------------------------------------------------------------------
 export async function completeOnboarding(formData: FormData) {
   const agencyName = formData.get("agencyName") as string;
-  const nombreRastreo = formData.get("nombreRastreo") as string; // <-- NUEVO: Capturamos el nombre
+  const nombreRastreo = formData.get("nombreRastreo") as string;
   const idealistaUrl = formData.get("idealistaUrl") as string;
 
-  if (!agencyName || !idealistaUrl || !nombreRastreo) {
-    return { error: "Faltan datos por rellenar." };
-  }
+  if (!agencyName || !idealistaUrl || !nombreRastreo) return { error: "Faltan datos." };
 
-  // 1. Verificamos usuario
   const supabase = await createClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return redirect("/login");
 
-  if (authError || !user) return redirect("/login");
-
-  // 2. Cliente ADMIN PURO
   const supabaseAdmin = await createSupabaseAdminClient();
 
-  // 3. Creamos la agencia
   const { data: agencia, error: agenciaError } = await supabaseAdmin
     .from("agencias")
     .insert({ nombre_empresa: agencyName })
     .select("id_agencia")
     .single();
 
-  if (agenciaError || !agencia) {
-    console.error("ERROR CREANDO AGENCIA:", agenciaError);
-    return { error: "Hubo un problema al registrar la agencia." };
-  }
+  if (agenciaError || !agencia) return { error: "Error creando agencia." };
 
-  // 4. Vinculamos al usuario
-  const { error: userError } = await supabaseAdmin
-    .from("usuarios")
-    .update({ id_agencia: agencia.id_agencia })
-    .eq("id_usuario", user.id);
+  await supabaseAdmin.from("usuarios").update({ id_agencia: agencia.id_agencia }).eq("id_usuario", user.id);
 
-  if (userError) {
-    console.error("ERROR VINCULANDO USUARIO:", userError);
-    return { error: "Hubo un problema al vincular tu perfil." };
-  }
-
-  // 5. Guardamos EL PRIMER RASTREADOR
-  const { error: configError } = await supabaseAdmin
-    .from("configuracion_rastreo")
-    .insert({
+  await supabaseAdmin.from("configuracion_rastreo").insert({
       id_agencia: agencia.id_agencia,
-      nombre_rastreo: nombreRastreo, // <-- Lo guardamos en la DB
+      nombre_rastreo: nombreRastreo,
       url_idealista: idealistaUrl,
       activa: true,
-    });
+  });
 
-  if (configError) {
-    console.error("ERROR GUARDANDO CONFIG:", configError);
-    return { error: "Hubo un problema al configurar el rastreador." };
-  }
-
-  // 6. --- INTEGRACIÓN DE STRIPE ---
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
   const origin = (await headers()).get("origin") || "https://prop-tech-radar.vercel.app";
-
   let checkoutUrl = ""; 
 
   try {
     const stripeSession = await stripe.checkout.sessions.create({
       mode: "subscription",
-      line_items: [
-        {
-          price: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID,
-          quantity: 1,
-        },
-      ],
+      line_items: [{ price: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID, quantity: 1 }],
+      subscription_data: { trial_period_days: 3 }, // AQUÍ DAMOS EL TRIAL DE 3 DÍAS INICIAL
       success_url: `${origin}/dashboard`,
       cancel_url: `${origin}/dashboard/config`,
       client_reference_id: agencia.id_agencia, 
       customer_email: user.email,
     });
-
-    if (stripeSession.url) {
-      checkoutUrl = stripeSession.url; 
-    }
+    if (stripeSession.url) checkoutUrl = stripeSession.url; 
   } catch (stripeError) {
-    console.error("ERROR STRIPE (Real):", stripeError);
-    return { error: "Hubo un problema al crear el enlace de pago." };
+    return { error: "Error de Stripe." };
   }
 
-  if (checkoutUrl) {
-    redirect(checkoutUrl);
-  }
-
+  if (checkoutUrl) redirect(checkoutUrl);
   return redirect("/dashboard");
 }
 
-// --- Acción adaptada temporalmente para evitar errores SQL ---
-// (La reescribiremos por completo en el siguiente paso para el nuevo Dashboard)
-export async function updateScrapingConfig(formData: FormData) {
+// ------------------------------------------------------------------
+// 2. AÑADIR NUEVO RADAR (Sube cuota en Stripe al instante)
+// ------------------------------------------------------------------
+export async function addRadarUpfrontCharge(formData: FormData) {
   const idealistaUrl = formData.get("idealistaUrl") as string;
-  const nombreRastreo = formData.get("nombreRastreo") as string || "Nuevo Rastreador";
+  const nombreRastreo = formData.get("nombreRastreo") as string;
+
+  if (!idealistaUrl || !nombreRastreo) return { error: "Faltan datos." };
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-
   if (!user) return { error: "No autorizado." };
 
-  const { data: userData, error: userError } = await supabase
-      .from("usuarios")
-      .select("id_agencia")
-      .eq("id_usuario", user.id)
-      .single();
-
-  if (userError || !userData?.id_agencia) {
-      return { error: "No se encontró la agencia del usuario." };
-  }
-
   const supabaseAdmin = await createSupabaseAdminClient();
+  const { data: userData } = await supabaseAdmin.from("usuarios").select("id_agencia").eq("id_usuario", user.id).single();
+  const { data: agencia } = await supabaseAdmin.from("agencias").select("plan_stripe_id").eq("id_agencia", userData?.id_agencia).single();
 
-  // Ahora insertamos en lugar de upsert, porque permitimos múltiples
-  const { error: insertError } = await supabaseAdmin
-      .from("configuracion_rastreo")
-      .insert({
-          id_agencia: userData.id_agencia,
-          nombre_rastreo: nombreRastreo,
-          url_idealista: idealistaUrl,
-          activa: true,
-      });
+  if (!agencia?.plan_stripe_id) return { error: "Suscripción no encontrada." };
 
-  if (insertError) {
-      console.error("Error insertando nueva config_rastreo:", insertError);
-      return { error: "No se pudo guardar la configuración." };
+  try {
+    // Obtenemos la suscripción de Stripe para saber la cantidad actual
+    const subscription = await stripe.subscriptions.retrieve(agencia.plan_stripe_id);
+    const subItemId = subscription.items.data[0].id;
+    const currentQty = subscription.items.data[0].quantity || 1;
+
+    // Actualizamos Stripe: Subimos la cantidad y FORZAMOS cobro inmediato
+    await stripe.subscriptions.update(subscription.id, {
+      items: [{ id: subItemId, quantity: currentQty + 1 }],
+      proration_behavior: "always_invoice",
+      trial_end: "now", // Si estaba en trial, se cancela y empieza a pagar ya
+    });
+
+    // Guardamos en BD
+    await supabaseAdmin.from("configuracion_rastreo").insert({
+        id_agencia: userData!.id_agencia,
+        nombre_rastreo: nombreRastreo,
+        url_idealista: idealistaUrl,
+        activa: true,
+    });
+
+    revalidatePath("/dashboard/config");
+    return { success: "Radar añadido y cuota actualizada." };
+
+  } catch (error: any) {
+    console.error("Error Stripe Upsell:", error);
+    return { error: "Error al procesar el pago. Verifica tu tarjeta en facturación." };
   }
+}
+
+// ------------------------------------------------------------------
+// 3. EDITAR SOLO EL NOMBRE
+// ------------------------------------------------------------------
+export async function updateRadarName(id: string, newName: string) {
+  const supabaseAdmin = await createSupabaseAdminClient();
+  const { error } = await supabaseAdmin.from("configuracion_rastreo").update({ nombre_rastreo: newName }).eq("id", id);
+  if (error) return { error: "Error actualizando el nombre." };
 
   revalidatePath("/dashboard/config");
-  return { success: "¡Rastreador añadido con éxito!" };
+  return { success: true };
+}
+
+// ------------------------------------------------------------------
+// 4. ELIMINAR RADAR (Baja la cuota en Stripe)
+// ------------------------------------------------------------------
+export async function deleteRadar(id: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "No autorizado" };
+
+  const supabaseAdmin = await createSupabaseAdminClient();
+  const { data: userData } = await supabaseAdmin.from("usuarios").select("id_agencia").eq("id_usuario", user.id).single();
+  const { data: agencia } = await supabaseAdmin.from("agencias").select("plan_stripe_id").eq("id_agencia", userData?.id_agencia).single();
+
+  if (!agencia?.plan_stripe_id) return { error: "Suscripción no encontrada." };
+
+  try {
+    // Comprobamos cuántos radares tiene actualmente en BD para no dejarle en 0 por error
+    const { count } = await supabaseAdmin.from("configuracion_rastreo").select("id", { count: 'exact' }).eq("id_agencia", userData!.id_agencia);
+    if (count && count <= 1) return { error: "No puedes eliminar tu único radar. Cancela la suscripción en Facturación." };
+
+    // Borramos de la BD
+    await supabaseAdmin.from("configuracion_rastreo").delete().eq("id", id);
+
+    // Actualizamos Stripe bajando la cantidad
+    const subscription = await stripe.subscriptions.retrieve(agencia.plan_stripe_id);
+    const subItemId = subscription.items.data[0].id;
+    const currentQty = subscription.items.data[0].quantity || 2;
+
+    await stripe.subscriptions.update(subscription.id, {
+      items: [{ id: subItemId, quantity: currentQty - 1 }],
+      proration_behavior: "always_invoice" // Para que le aplique saldo a favor si corresponde
+    });
+
+    revalidatePath("/dashboard/config");
+    return { success: "Radar eliminado. Cuota reducida para el próximo mes." };
+  } catch (error) {
+    console.error("Error Delete Radar:", error);
+    return { error: "Error interno al eliminar." };
+  }
 }

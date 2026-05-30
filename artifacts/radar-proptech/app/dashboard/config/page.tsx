@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import ConfigWizard from "./ConfigWizard"; // El componente cliente de Onboarding
-import ManageRadars from "./ManageRadars"; // El componente cliente para añadir más radares
+import ConfigWizard from "./ConfigWizard"; 
+import ManageRadars from "./ManageRadars"; 
 
 export default async function ConfigRouter() {
   const supabase = await createClient();
@@ -9,7 +9,6 @@ export default async function ConfigRouter() {
 
   if (!user) return redirect("/login");
 
-  // Comprobamos si el usuario ya tiene agencia vinculada
   const { data: userData } = await supabase
     .from("usuarios")
     .select("id_agencia")
@@ -18,12 +17,23 @@ export default async function ConfigRouter() {
 
   const hasAgency = !!userData?.id_agencia;
 
+  // Si tiene agencia, extraemos sus radares para enviarlos al componente
+  let radares = [];
+  if (hasAgency) {
+    const { data } = await supabase
+      .from("configuracion_rastreo")
+      .select("*")
+      .eq("id_agencia", userData.id_agencia)
+      .order("created_at", { ascending: true });
+    radares = data || [];
+  }
+
   return (
-    <div className="max-w-4xl mx-auto animate-in fade-in duration-500">
+    <div className="max-w-5xl mx-auto animate-in fade-in duration-500">
       {!hasAgency ? (
         <ConfigWizard />
       ) : (
-        <ManageRadars />
+        <ManageRadars initialRadars={radares} />
       )}
     </div>
   );
