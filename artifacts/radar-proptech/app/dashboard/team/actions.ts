@@ -45,7 +45,7 @@ export async function addAgent(formData: FormData) {
 
   if (authError) {
     console.error("Error Auth:", authError);
-    return { error: "No se pudo crear el usuario. Asegúrate de que el email no esté ya registrado." };
+    return { error: `Error de Supabase: ${authError.message}` };
   }
 
   // 3. Vincularlo a la agencia con rol de AGENTE
