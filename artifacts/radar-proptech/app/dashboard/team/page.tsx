@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import TeamManager from "./TeamManager";
 
@@ -8,24 +9,29 @@ export default async function TeamRouter() {
 
   if (!user) return redirect("/login");
 
-  // Obtener datos del admin
+  // Obtener datos del usuario logueado
   const { data: adminData } = await supabase
     .from("usuarios")
     .select("id_agencia, rol")
     .eq("id_usuario", user.id)
     .single();
 
+  // Expulsar si no es admin ni dios
   if (!adminData || (adminData.rol !== "admin" && adminData.rol !== "dios")) {
     return redirect("/dashboard"); 
   }
 
-  // Obtener todos los usuarios de esa misma agencia
-  const { data: teamMembers } = await supabase
+  // ⚠️ LA LLAVE MAESTRA: Usamos el cliente Admin para poder leer las filas de todo el equipo
+  const supabaseAdmin = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  // Obtener todos los usuarios de esa misma agencia saltándonos el RLS de lectura
+  const { data: teamMembers } = await supabaseAdmin
     .from("usuarios")
     .select("id_usuario, rol")
     .eq("id_agencia", adminData.id_agencia);
-
-  // Vamos a buscar los emails de estos usuarios (usualmente guardados en Supabase o los sacaremos vía auth si fuera necesario, pero mostraremos IDs o roles de momento de forma segura)
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-500">
