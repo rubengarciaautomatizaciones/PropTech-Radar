@@ -1,0 +1,17 @@
+{
+  "node": {
+    "40f2d8b4a3a22582da0258b9ae339376b98416ed41": {
+      "workers": {
+        "app/(auth)/signup/page": {
+          "moduleId": 20239,
+          "async": false,
+          "exportedName": "$$RSC_SERVER_ACTION_0",
+          "filename": "artifacts/radar-proptech/app/(auth)/signup/page.tsx"
+        }
+      },
+      "exportedName": "$$RSC_SERVER_ACTION_0",
+      "filename": "artifacts/radar-proptech/app/(auth)/signup/page.tsx"
+    }
+  },
+  "edge": {}
+}

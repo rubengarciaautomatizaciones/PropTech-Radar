@@ -1,0 +1,3 @@
+module.exports=[44135,a=>{"use strict";var b=a.i(29624);a.s(["default",0,function({children:a}){return(0,b.jsx)("html",{lang:"es",children:(0,b.jsx)("body",{className:"antialiased text-gray-900",children:a})})},"metadata",0,{title:"Radar PropTech",description:"La herramienta definitiva para inmobiliarias"}])},16280,a=>{a.n(a.i(44135))}];
+
+//# sourceMappingURL=artifacts_radar-proptech_app_layout_tsx_018xuf3._.js.map

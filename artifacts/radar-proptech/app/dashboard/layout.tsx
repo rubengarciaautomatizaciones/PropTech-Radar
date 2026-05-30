@@ -1,20 +1,37 @@
-// artifacts/radar-proptech/app/dashboard/layout.tsx
 import { LayoutDashboard, Users, Settings, CreditCard } from "lucide-react";
 import Sidebar, { type NavLink } from "@/components/Sidebar";
+import { createClient } from "@/lib/supabase/server";
 
-// AQUÍ ESTABA EL ERROR 404. Hemos cambiado "/dashboard/dashboard" por "/dashboard"
-const navLinks: NavLink[] = [
-  { href: "/dashboard",           label: "Panel Principal", icon: LayoutDashboard },
-  { href: "/dashboard/team",      label: "Equipo",          icon: Users },
-  { href: "/dashboard/config",    label: "Configuración",   icon: Settings },
-  { href: "/dashboard/billing",   label: "Facturación",     icon: CreditCard },
-];
-
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  let rol = "agente"; // Por defecto, el rol más restrictivo
+
+  if (user) {
+    const { data: userData } = await supabase
+      .from("usuarios")
+      .select("rol")
+      .eq("id_usuario", user.id)
+      .single();
+
+    if (userData) rol = userData.rol;
+  }
+
+  // Menú dinámico basado en el rol
+  const navLinks: NavLink[] = [
+    { href: "/dashboard", label: "Panel Principal", icon: LayoutDashboard },
+    ...(rol === 'admin' ? [
+      { href: "/dashboard/team",      label: "Equipo",          icon: Users },
+      { href: "/dashboard/config",    label: "Configuración",   icon: Settings },
+      { href: "/dashboard/billing",   label: "Facturación",     icon: CreditCard },
+    ] : [])
+  ];
+
   return (
     <div className="min-h-screen flex bg-gray-100">
       <Sidebar navLinks={navLinks} />
