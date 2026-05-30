@@ -22,10 +22,10 @@ export default async function DashboardLayout({
     if (userData) rol = userData.rol;
   }
 
-  // Menú dinámico basado en el rol
+  // Menú dinámico basado en el rol (admin y dios ven todo)
   const navLinks: NavLink[] = [
     { href: "/dashboard", label: "Panel Principal", icon: LayoutDashboard },
-    ...(rol === 'admin' ? [
+    ...(rol === 'admin' || rol === 'dios' ? [
       { href: "/dashboard/team",      label: "Equipo",          icon: Users },
       { href: "/dashboard/config",    label: "Configuración",   icon: Settings },
       { href: "/dashboard/billing",   label: "Facturación",     icon: CreditCard },

@@ -19,14 +19,17 @@ export async function redirectToCustomerPortal() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
-
+  
+  // Sobre la línea 22, después de traer la agencia...
   const { data: userData } = await supabaseAdmin
     .from("usuarios")
-    .select("id_agencia")
+    .select("id_agencia, rol")
     .eq("id_usuario", user.id)
     .single();
 
-  if (!userData?.id_agencia) return { error: "No tienes una agencia vinculada." };
+  if (userData?.rol === "dios") {
+    return { error: "Modo Dios activado. Tienes acceso gratuito de por vida y no requieres portal de facturación." };
+  }
 
   const { data: agencia } = await supabaseAdmin
     .from("agencias")

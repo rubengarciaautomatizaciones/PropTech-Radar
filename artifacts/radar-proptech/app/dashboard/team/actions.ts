@@ -32,7 +32,7 @@ export async function addAgent(formData: FormData) {
     .eq("id_usuario", user.id)
     .single();
 
-  if (!adminData || adminData.rol !== "admin") {
+  if (!adminData || (adminData.rol !== "admin" && adminData.rol !== "dios")) {
     return { error: "Solo los administradores pueden añadir equipo." };
   }
 
@@ -67,7 +67,7 @@ export async function addAgent(formData: FormData) {
 export async function removeAgent(agentId: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "No autorizado." };
+  if (!adminData || (adminData.rol !== "admin" && adminData.rol !== "dios")) return { error: "No autorizado." };
 
   const supabaseAdmin = await getAdminClient();
 

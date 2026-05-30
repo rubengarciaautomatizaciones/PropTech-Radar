@@ -15,8 +15,8 @@ export default async function TeamRouter() {
     .eq("id_usuario", user.id)
     .single();
 
-  if (!adminData || adminData.rol !== "admin") {
-    return redirect("/dashboard"); // Expulsar si no es admin
+  if (!adminData || (adminData.rol !== "admin" && adminData.rol !== "dios")) {
+    return redirect("/dashboard"); 
   }
 
   // Obtener todos los usuarios de esa misma agencia
