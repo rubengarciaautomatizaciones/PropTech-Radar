@@ -63,18 +63,27 @@ export async function addAgent(formData: FormData) {
   return { success: "¡Agente añadido correctamente!" };
 }
 
-
 export async function removeAgent(agentId: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!adminData || (adminData.rol !== "admin" && adminData.rol !== "dios")) return { error: "No autorizado." };
+  if (!user) return { error: "No autorizado." };
 
   const supabaseAdmin = await getAdminClient();
 
   // Verificación de seguridad
-  const { data: adminData } = await supabaseAdmin.from("usuarios").select("id_agencia, rol").eq("id_usuario", user.id).single();
-  if (!adminData || adminData.rol !== "admin") return { error: "No autorizado." };
-  if (user.id === agentId) return { error: "No puedes eliminarte a ti mismo." };
+  const { data: adminData } = await supabaseAdmin
+    .from("usuarios")
+    .select("id_agencia, rol")
+    .eq("id_usuario", user.id)
+    .single();
+
+  if (!adminData || (adminData.rol !== "admin" && adminData.rol !== "dios")) {
+    return { error: "No autorizado." };
+  }
+
+  if (user.id === agentId) {
+    return { error: "No puedes eliminarte a ti mismo." };
+  }
 
   // Eliminar al agente del sistema de autenticación de Supabase (esto borra también sus datos por cascada si está configurado)
   const { error } = await supabaseAdmin.auth.admin.deleteUser(agentId);
