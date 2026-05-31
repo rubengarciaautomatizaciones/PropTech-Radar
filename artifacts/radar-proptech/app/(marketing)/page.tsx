@@ -3,22 +3,52 @@
 
 import { useState, useTransition } from "react";
 import { joinWaitlist } from "./actions/waitlist";
-import { Zap, FileText, ShieldAlert } from "lucide-react";
+import { Zap, FileText, ShieldAlert, Cpu, Database, ChevronRight, CheckCircle2, Linkedin } from "lucide-react";
 
-export default function WaitlistLanding() {
+export default function PriestleyWaitlistLanding() {
   const [isPending, startTransition] = useTransition();
-  const [status, setStatus] = useState<{ success?: boolean; error?: string } | null>(null);
+  const [step, setStep] = useState(0);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setStatus(null);
-    const formData = new FormData(e.currentTarget);
+  const [formData, setFormData] = useState({
+    nombre: "",
+    agencia: "",
+    email: "",
+    telefono: "",
+    zona: "",
+    q_situacion: "",
+    q_objetivo: "",
+    q_obstaculo: "",
+    q_presupuesto: "",
+    q_abierta: ""
+  });
 
+  const handleUpdate = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const nextStep = () => {
+    if (step === 1 && (!formData.nombre || !formData.agencia || !formData.email || !formData.telefono || !formData.zona)) {
+      setErrorMsg("Por favor, completa todos los datos de contacto para continuar.");
+      return;
+    }
+    setErrorMsg("");
+    setStep(prev => prev + 1);
+  };
+
+  const submitForm = () => {
     startTransition(async () => {
+      // formData aquí es el objeto fuertemente tipado que espera TypeScript
       const result = await joinWaitlist(formData);
-      setStatus(result);
+      if (result.error) {
+        setErrorMsg(result.error);
+        setStep(1); 
+      } else {
+        setStep(7); 
+      }
     });
   };
+
 
   return (
     <div className="w-full">
