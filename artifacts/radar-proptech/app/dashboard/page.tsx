@@ -73,9 +73,21 @@ export default function DashboardPage() {
   };
 
   const handleGeneratePDF = async (lead: LeadData) => {
+    // Función auxiliar para forzar la descarga segura saltándose el bloqueador de popups
+    const triggerDownload = (url: string) => {
+      const link = document.createElement('a');
+      // Supabase fuerza la descarga si le pasamos este parámetro
+      const downloadUrl = url.includes('?') ? `${url}&download=` : `${url}?download=`;
+      link.href = downloadUrl;
+      link.setAttribute('download', `Dossier_CMA_${lead.id_anuncio}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
     // Si ya existe, forzamos la descarga directamente
     if (lead.pdf_cma_url) {
-      window.open(lead.pdf_cma_url, "_blank");
+      triggerDownload(lead.pdf_cma_url);
       return;
     }
 
@@ -90,7 +102,8 @@ export default function DashboardPage() {
 
       if (data.success && data.url) {
         setLeads(current => current.map(l => l.id_anuncio === lead.id_anuncio ? { ...l, pdf_cma_url: data.url } : l));
-        window.open(data.url, "_blank"); // Forzamos la descarga / apertura en nueva pestaña
+        // Forzamos la descarga del PDF recién creado
+        triggerDownload(data.url); 
       } else {
         alert("Error generando el documento.");
       }
