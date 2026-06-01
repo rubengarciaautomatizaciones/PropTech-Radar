@@ -1,12 +1,21 @@
+// artifacts/radar-proptech/app/api/cma/generate/route.ts
 import { NextResponse } from 'next/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 export const maxDuration = 60; 
 
+// EL ESCUDO: pdf-lib solo soporta WinAnsi (Latin-1). Los emojis revientan el servidor en seco.
+function cleanText(text: string | null | undefined) {
+  if (!text) return "";
+  return text
+    .replace(/€/g, 'EUR') // pdf-lib a veces no mapea bien el euro
+    .replace(/[^\x20-\x7E\xA0-\xFF]/g, '') // Elimina emojis (📍, 🏠, 🤩) y caracteres raros
+    .trim();
+}
+
 export async function POST(request: Request) {
   try {
-    console.log("1. Iniciando generación de CMA...");
     const { id_anuncio, id_agencia } = await request.json();
 
     if (!id_anuncio || !id_agencia) {
@@ -18,7 +27,6 @@ export async function POST(request: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    console.log(`2. Buscando lead ${id_anuncio} para agencia ${id_agencia}...`);
     const { data: lead, error: leadError } = await supabaseAdmin
       .from('propiedades_rastreadas')
       .select('*')
@@ -27,12 +35,11 @@ export async function POST(request: Request) {
       .single();
 
     if (leadError || !lead) {
-      console.error("Error buscando lead:", leadError);
       return NextResponse.json({ error: "Lead no encontrado en la Base de Datos." }, { status: 404 });
     }
 
+    // Si ya existe el PDF, no gastamos recursos del servidor
     if (lead.pdf_cma_url) {
-      console.log("El PDF ya existía, devolviendo URL.");
       return NextResponse.json({ success: true, url: lead.pdf_cma_url });
     }
 
@@ -42,10 +49,9 @@ export async function POST(request: Request) {
       .eq('id_agencia', id_agencia)
       .single();
 
-    // Reparación del posible error de null.toUpperCase()
-    const nombreEmpresa = agencia?.nombre_empresa ? String(agencia.nombre_empresa).toUpperCase() : 'AGENCIA INMOBILIARIA';
+    const nombreEmpresa = cleanText(agencia?.nombre_empresa?.toUpperCase() || 'AGENCIA INMOBILIARIA');
 
-    console.log("3. Calculando comparables...");
+    // CÁLCULO DE VALORACIÓN (CMA REAL)
     const { data: comparables } = await supabaseAdmin
       .from('propiedades_rastreadas')
       .select('precio, m2')
@@ -63,7 +69,6 @@ export async function POST(request: Request) {
     }
     const valorEstimado = (lead.m2 && avgPrecioM2) ? (lead.m2 * avgPrecioM2) : 0;
 
-    console.log("4. Creando documento PDF...");
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage([595.28, 841.89]); 
     const { width, height } = page.getSize();
@@ -78,18 +83,21 @@ export async function POST(request: Request) {
     // Cabecera
     page.drawRectangle({ x: 0, y: height - 100, width: width, height: 100, color: kavoxColor });
     page.drawText(nombreEmpresa, { x: 40, y: height - 50, size: 22, font: fontBold, color: rgb(1, 1, 1) });
-    page.drawText('Dossier de Captación & Análisis de Mercado', { x: 40, y: height - 75, size: 12, font: fontRegular, color: rgb(1, 1, 1) });
+    page.drawText('Dossier de Captacion & Analisis de Mercado', { x: 40, y: height - 75, size: 12, font: fontRegular, color: rgb(1, 1, 1) });
 
-    page.drawText(lead.titulo || 'Inmueble Captado', { x: 40, y: height - 150, size: 16, font: fontBold, color: darkGray });
-    page.drawText(`📍 ${lead.direccion || 'Ubicación reservada'}`, { x: 40, y: height - 175, size: 11, font: fontRegular, color: rgb(0.4, 0.4, 0.4) });
+    // Título y dirección limpios de Emojis!
+    const safeTitulo = cleanText(lead.titulo || 'Inmueble Captado');
+    const safeDireccion = cleanText(lead.direccion || 'Ubicacion reservada');
 
-    console.log("5. Intentando incrustar imagen...");
+    page.drawText(safeTitulo, { x: 40, y: height - 150, size: 16, font: fontBold, color: darkGray });
+    page.drawText(`Direccion: ${safeDireccion}`, { x: 40, y: height - 175, size: 11, font: fontRegular, color: rgb(0.4, 0.4, 0.4) });
+
+    // Inserción Segura de Imagen con Fallback
     let imageDrawn = false;
     if (lead.foto) {
       try {
-        // Añadimos un temporizador para que no se quede colgado
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 segundos max
+        const timeoutId = setTimeout(() => controller.abort(), 5000); 
 
         const imageResponse = await fetch(lead.foto, { 
           headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
@@ -109,10 +117,9 @@ export async function POST(request: Request) {
 
           page.drawImage(imageToEmbed, { x: 40, y: height - 400, width: 250, height: 180 });
           imageDrawn = true;
-          console.log("Imagen incrustada con éxito.");
         }
       } catch (e: any) {
-        console.warn("Fallo al incrustar la imagen (formato no soportado o Timeout):", e.message);
+        console.warn("Fallo imagen (WebP o error de red):", e.message);
       }
     }
 
@@ -122,67 +129,64 @@ export async function POST(request: Request) {
       page.drawText("Imagen no compatible con PDF.", { x: 80, y: height - 330, size: 9, font: fontRegular, color: rgb(0.6,0.6,0.6) });
     }
 
-    console.log("6. Escribiendo textos...");
     const startY = height - 220;
-    page.drawText('Características de la Propiedad', { x: 310, y: startY, size: 14, font: fontBold, color: kavoxColor });
+    page.drawText('Caracteristicas de la Propiedad', { x: 310, y: startY, size: 14, font: fontBold, color: kavoxColor });
 
     const details = [
-      `Precio Publicado: ${lead.precio ? lead.precio.toLocaleString('es-ES') + ' €' : 'N/D'}`,
-      `Superficie: ${lead.m2 ? lead.m2 + ' m²' : 'N/D'}`,
+      `Precio Publicado: ${lead.precio ? lead.precio.toLocaleString('es-ES') + ' EUR' : 'N/D'}`,
+      `Superficie: ${lead.m2 ? lead.m2 + ' m2' : 'N/D'}`,
       `Habitaciones: ${lead.habitaciones || '-'}`,
-      `Baños: ${lead.banos || '-'}`,
+      `Banos: ${lead.banos || '-'}`,
       `Planta: ${lead.planta || '-'}`,
-      `Estado actual: En Comercialización`
+      `Estado actual: En Comercializacion`
     ];
 
     details.forEach((text, i) => {
-      page.drawText(`• ${text}`, { x: 310, y: startY - 30 - (i * 25), size: 11, font: fontRegular, color: darkGray });
+      page.drawText(`- ${cleanText(text)}`, { x: 310, y: startY - 30 - (i * 25), size: 11, font: fontRegular, color: darkGray });
     });
 
     // Análisis de Mercado Inferior
     page.drawRectangle({ x: 40, y: height - 600, width: width - 80, height: 140, color: lightGray });
-    page.drawText('Análisis Comparativo de Mercado (CMA)', { x: 60, y: height - 490, size: 14, font: fontBold, color: kavoxColor });
+    page.drawText('Analisis Comparativo de Mercado (CMA)', { x: 60, y: height - 490, size: 14, font: fontBold, color: kavoxColor });
     page.drawText(`Basado en ${comparables ? comparables.length : 1} testigos captados recientemente en esta zona.`, { x: 60, y: height - 510, size: 10, font: fontRegular, color: rgb(0.4, 0.4, 0.4) });
 
-    page.drawText('Valor Medio M² en la zona:', { x: 60, y: height - 540, size: 12, font: fontBold, color: darkGray });
-    page.drawText(`${avgPrecioM2.toLocaleString('es-ES')} €/m²`, { x: 60, y: height - 565, size: 20, font: fontBold, color: kavoxColor });
+    page.drawText('Valor Medio m2 en la zona:', { x: 60, y: height - 540, size: 12, font: fontBold, color: darkGray });
+    page.drawText(`${avgPrecioM2.toLocaleString('es-ES')} EUR/m2`, { x: 60, y: height - 565, size: 20, font: fontBold, color: kavoxColor });
 
     if (valorEstimado > 0) {
       page.drawText('Valor Estimado del Inmueble:', { x: 310, y: height - 540, size: 12, font: fontBold, color: darkGray });
-      page.drawText(`${valorEstimado.toLocaleString('es-ES')} €`, { x: 310, y: height - 565, size: 20, font: fontBold, color: rgb(0.86, 0.15, 0.15) }); 
+      page.drawText(`${valorEstimado.toLocaleString('es-ES')} EUR`, { x: 310, y: height - 565, size: 20, font: fontBold, color: rgb(0.86, 0.15, 0.15) }); 
     } else {
-      page.drawText('Faltan datos de M² para estimación.', { x: 310, y: height - 565, size: 12, font: fontRegular, color: darkGray });
+      page.drawText('Faltan datos de m2 para estimacion.', { x: 310, y: height - 565, size: 12, font: fontRegular, color: darkGray });
     }
 
     // Pie de Página
     page.drawRectangle({ x: 0, y: 0, width: width, height: 60, color: darkGray });
-    page.drawText('Este informe es automático. Para una tasación oficial y un plan de venta garantizado, contáctanos.', { x: 60, y: 25, size: 10, font: fontRegular, color: rgb(1, 1, 1) });
+    page.drawText('Este informe es automatico. Para una tasacion oficial y plan de venta garantizado, contactanos.', { x: 60, y: 25, size: 10, font: fontRegular, color: rgb(1, 1, 1) });
 
-    console.log("7. Guardando PDF Bytes...");
     const pdfBytes = await pdfDoc.save();
 
-    console.log("8. Subiendo a Supabase Storage...");
+    // Encapsulamos el Uint8Array en un Buffer seguro para Node.js
+    const buffer = Buffer.from(pdfBytes);
+
     const fileName = `${id_agencia}/cma_${id_anuncio}_${Date.now()}.pdf`;
 
     const { error: uploadError } = await supabaseAdmin.storage
       .from('informes_cma')
-      .upload(fileName, pdfBytes, { contentType: 'application/pdf', upsert: true });
+      .upload(fileName, buffer, { contentType: 'application/pdf', upsert: true });
 
     if (uploadError) {
-      console.error("Error Storage Upload:", uploadError);
       return NextResponse.json({ error: `Fallo al subir a Storage: ${uploadError.message}` }, { status: 500 });
     }
 
     const { data: publicUrlData } = supabaseAdmin.storage.from('informes_cma').getPublicUrl(fileName);
     const pdfUrl = publicUrlData.publicUrl;
 
-    console.log("9. PDF subido con éxito, actualizando DB...");
     await supabaseAdmin.from('propiedades_rastreadas').update({ pdf_cma_url: pdfUrl }).eq('id_anuncio', id_anuncio).eq('id_agencia', id_agencia);
 
     return NextResponse.json({ success: true, url: pdfUrl });
 
   } catch (globalError: any) {
-    console.error("Error Global CMA Route:", globalError);
     return NextResponse.json({ error: `Excepción no controlada: ${globalError.message}` }, { status: 500 });
   }
 }
