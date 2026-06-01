@@ -1,3 +1,4 @@
+// artifacts/radar-proptech/app/dashboard/config/page.tsx
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import ConfigWizard from "./ConfigWizard"; 
@@ -17,12 +18,13 @@ export default async function ConfigRouter() {
 
   const hasAgency = !!userData?.id_agencia;
 
-  // Si tiene agencia, extraemos sus radares para enviarlos al componente
-  let radares = [];
+  // ⚠️ CORRECCIÓN TYPESCRIPT: Le decimos explícitamente que es un array
+  let radares: any[] = [];
+
   if (hasAgency) {
     const { data } = await supabase
       .from("configuracion_rastreo")
-      .select("id, nombre_rastreo, url_idealista, historial_cambios_url") // <--- AÑADE ESTO
+      .select("id, nombre_rastreo, url_idealista, historial_cambios_url") 
       .eq("id_agencia", userData.id_agencia)
       .order("created_at", { ascending: true });
     radares = data || [];
