@@ -1,4 +1,3 @@
-// artifacts/radar-proptech/tailwind.config.ts
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -15,7 +14,7 @@ const config: Config = {
           surface: "#F9FAFB",
           body: "#111827",
           muted: "#4B5563",
-          accent: "#0F766E", // Teal Oscuro / Petróleo
+          accent: "#008799", // <-- TU NUEVO COLOR CORPORATIVO
           alert: "#DC2626",
           success: "#059669",
         }
