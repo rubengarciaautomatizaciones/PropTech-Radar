@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { Send, Smartphone, X, MapPin, ExternalLink, Phone } from "lucide-react";
+import { Send, Smartphone, X, MapPin, ExternalLink, Phone, ShieldAlert, ShieldCheck, Clock } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { updateLeadStatus } from "./actions";
 
@@ -24,6 +24,7 @@ type LeadData = {
   url: string;
   foto: string;
   estado: string;
+  lista_robinson: string; // <--- NUEVO CAMPO
   created_at: string;
 };
 
@@ -55,7 +56,6 @@ export default function DashboardPage() {
           router.push("/dashboard/config");
         } else if (userData.id_agencia) {
 
-          // 1. Cargar Radares
           const { data: trackersData } = await supabase
             .from("configuracion_rastreo")
             .select("id, nombre_rastreo, telegram_chat_id, activa")
@@ -63,7 +63,7 @@ export default function DashboardPage() {
 
           if (trackersData) setTrackers(trackersData);
 
-          // 2. Cargar Leads (Particulares) ordenados por el más reciente
+          // ⚠️ ALERTA: Traemos la columna lista_robinson
           const { data: leadsData } = await supabase
             .from("propiedades_rastreadas")
             .select("*")
@@ -79,13 +79,11 @@ export default function DashboardPage() {
   }, [router, supabase]);
 
   const handleStatusChange = async (leadId: string, agencyId: string, newStatus: string) => {
-    // Actualizamos optimísticamente la UI para que sea instantáneo
     setLeads(currentLeads => 
       currentLeads.map(lead => 
         lead.id_anuncio === leadId ? { ...lead, estado: newStatus } : lead
       )
     );
-    // Ejecutamos la Server Action
     await updateLeadStatus(leadId, agencyId, newStatus);
   };
 
@@ -94,7 +92,6 @@ export default function DashboardPage() {
   const telegramBotUsername = "RadarPropTech_bot"; 
   const telegramLink = `https://t.me/${telegramBotUsername}?start=${selectedTrackerId}`;
 
-  // Función de ayuda para los colores del estado
   const getStatusColor = (estado: string) => {
     switch (estado) {
       case 'nuevo': return 'bg-blue-100 text-blue-800 border-blue-200';
@@ -108,7 +105,6 @@ export default function DashboardPage() {
   return (
     <div className="space-y-10 animate-in fade-in duration-500">
 
-      {/* HEADER */}
       <div className="flex justify-between items-center bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Panel Principal</h1>
@@ -121,7 +117,6 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* SECCIÓN 1: RADARES */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-slate-800">Tus Zonas Activas</h2>
         {trackers.length === 0 ? (
@@ -162,7 +157,6 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* SECCIÓN 2: CRM DE LEADS */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-slate-800">Tus Leads (Particulares)</h2>
 
@@ -179,6 +173,7 @@ export default function DashboardPage() {
                     <th className="p-4 font-medium">Inmueble</th>
                     <th className="p-4 font-medium">Precio</th>
                     <th className="p-4 font-medium">Contacto</th>
+                    <th className="p-4 font-medium">Lista Robinson</th>
                     <th className="p-4 font-medium">Estado</th>
                   </tr>
                 </thead>
@@ -209,6 +204,24 @@ export default function DashboardPage() {
                           {lead.telefono}
                         </div>
                       </td>
+                      {/* ⚠️ COLUMNA LISTA ROBINSON */}
+                      <td className="p-4">
+                        {lead.lista_robinson === 'SI' && (
+                          <div className="flex items-center gap-1.5 text-red-700 bg-red-50 border border-red-200 px-2 py-1 rounded-md text-xs font-bold w-fit">
+                            <ShieldAlert className="w-3.5 h-3.5" /> PELIGRO (SÍ)
+                          </div>
+                        )}
+                        {lead.lista_robinson === 'NO' && (
+                          <div className="flex items-center gap-1.5 text-green-700 bg-green-50 border border-green-200 px-2 py-1 rounded-md text-xs font-bold w-fit">
+                            <ShieldCheck className="w-3.5 h-3.5" /> LIMPIO (NO)
+                          </div>
+                        )}
+                        {(!lead.lista_robinson || lead.lista_robinson === 'PROCESANDO') && (
+                          <div className="flex items-center gap-1.5 text-yellow-700 bg-yellow-50 border border-yellow-200 px-2 py-1 rounded-md text-xs font-bold w-fit">
+                            <Clock className="w-3.5 h-3.5" /> PROCESANDO
+                          </div>
+                        )}
+                      </td>
                       <td className="p-4">
                         <select 
                           value={lead.estado}
@@ -230,7 +243,7 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* --- MODAL NATIVO TAILWIND --- */}
+      {/* MODAL TELEGRAM */}
       {selectedTrackerId && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md relative flex flex-col p-6 animate-in zoom-in-95 duration-200">

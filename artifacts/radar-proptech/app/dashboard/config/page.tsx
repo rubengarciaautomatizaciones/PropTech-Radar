@@ -22,7 +22,7 @@ export default async function ConfigRouter() {
   if (hasAgency) {
     const { data } = await supabase
       .from("configuracion_rastreo")
-      .select("*")
+      .select("id, nombre_rastreo, url_idealista, historial_cambios_url") // <--- AÑADE ESTO
       .eq("id_agencia", userData.id_agencia)
       .order("created_at", { ascending: true });
     radares = data || [];

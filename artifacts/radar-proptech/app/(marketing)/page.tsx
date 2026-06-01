@@ -361,7 +361,7 @@ export default function PriestleyWaitlistLanding() {
               <p className="text-sm text-kavox-muted mb-4">Conecta directamente con el fundador en LinkedIn para tener prioridad en el proceso de selección de la Beta.</p>
 
               <a 
-                href="https://www.linkedin.com/in/tu-perfil-aqui" 
+                href="https://www.linkedin.com/in/ruben-garcia-ia/" 
                 target="_blank" 
                 rel="noreferrer"
                 className="inline-flex items-center justify-center gap-2 w-full bg-[#0A66C2] text-white p-3 rounded-md font-medium hover:bg-[#004182] transition-colors"

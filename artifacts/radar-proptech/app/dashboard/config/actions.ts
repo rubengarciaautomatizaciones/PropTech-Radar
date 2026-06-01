@@ -138,14 +138,53 @@
   // ------------------------------------------------------------------
   // 3. EDITAR SOLO EL NOMBRE
   // ------------------------------------------------------------------
-  export async function updateRadarName(id: string, newName: string) {
-    const supabaseAdmin = await createSupabaseAdminClient();
-    const { error } = await supabaseAdmin.from("configuracion_rastreo").update({ nombre_rastreo: newName }).eq("id", id);
-    if (error) return { error: "Error actualizando el nombre." };
+export async function updateRadar(id: string, newName: string, newUrl: string) {
+  const supabaseAdmin = await createSupabaseAdminClient();
 
-    revalidatePath("/dashboard/config");
-    return { success: true };
+  // 1. Obtener los datos actuales del radar
+  const { data: radar, error: fetchError } = await supabaseAdmin
+    .from("configuracion_rastreo")
+    .select("url_idealista, historial_cambios_url")
+    .eq("id", id)
+    .single();
+
+  if (fetchError || !radar) return { error: "Radar no encontrado." };
+
+  let newHistory = radar.historial_cambios_url || [];
+  const isUrlChanged = radar.url_idealista !== newUrl;
+
+  if (isUrlChanged) {
+    // 2. Lógica de 30 días rodantes
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    // Limpiamos del historial los cambios que ya tengan más de 30 días
+    newHistory = newHistory.filter((dateStr: string) => new Date(dateStr) > thirtyDaysAgo);
+
+    // 3. Validar si ya ha llegado al límite de 3
+    if (newHistory.length >= 3) {
+      return { error: "Has alcanzado el límite de 3 cambios de URL en los últimos 30 días." };
+    }
+
+    // Si pasa la validación, añadimos el cambio actual al historial
+    newHistory.push(new Date().toISOString());
   }
+
+  // 4. Actualizamos la BD
+  const { error } = await supabaseAdmin
+    .from("configuracion_rastreo")
+    .update({ 
+      nombre_rastreo: newName,
+      url_idealista: newUrl,
+      historial_cambios_url: newHistory
+    })
+    .eq("id", id);
+
+  if (error) return { error: "Error interno al actualizar." };
+
+  revalidatePath("/dashboard/config");
+  return { success: true };
+}
 
   // ------------------------------------------------------------------
   // 4. ELIMINAR RADAR

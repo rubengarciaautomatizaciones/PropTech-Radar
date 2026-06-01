@@ -84,6 +84,8 @@ export async function POST(request: Request) {
         continue;
       }
 
+      
+
       const idAnuncio = String(prop.adid);
 
       // Solo iteramos sobre los rastreadores legítimos de esta búsqueda
@@ -114,6 +116,7 @@ export async function POST(request: Request) {
             precio: precio,
             foto: foto,
             telefono: telefono
+            lista_robinson: 'PROCESANDO'
           });
 
           if (insertError) continue;
