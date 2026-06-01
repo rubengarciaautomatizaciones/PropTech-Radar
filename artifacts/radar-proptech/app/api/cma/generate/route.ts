@@ -1,3 +1,4 @@
+// artifacts/radar-proptech/app/api/cma/generate/route.ts
 import { NextResponse } from 'next/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // 1. Obtenemos los datos del Inmueble y de la Agencia
+    // 1. Obtenemos el Lead actual y la Agencia
     const { data: lead } = await supabaseAdmin
       .from('propiedades_rastreadas')
       .select('*')
@@ -31,63 +32,149 @@ export async function POST(request: Request) {
 
     if (!lead) return NextResponse.json({ error: "Lead no encontrado" }, { status: 404 });
 
-    // Si ya existe un PDF, simplemente devolvemos la URL para no gastar recursos
+    // Si ya existe el PDF, lo devolvemos para no rehacerlo
     if (lead.pdf_cma_url) {
       return NextResponse.json({ success: true, url: lead.pdf_cma_url });
     }
 
-    // 2. CREACIÓN DEL PDF (Magia Serverless)
+    // ==========================================
+    // 2. EL MOTOR DE VALORACIÓN (CMA REAL)
+    // ==========================================
+    const { data: comparables } = await supabaseAdmin
+      .from('propiedades_rastreadas')
+      .select('precio, m2')
+      .eq('id_agencia', id_agencia)
+      .eq('tipo', lead.tipo) // Comparamos pisos con pisos, chalets con chalets
+      .gt('m2', 0)
+      .gt('precio', 0);
+
+    let avgPrecioM2 = 0;
+    if (comparables && comparables.length > 0) {
+      const sumM2 = comparables.reduce((acc, curr) => acc + (curr.precio / curr.m2), 0);
+      avgPrecioM2 = Math.round(sumM2 / comparables.length);
+    } else if (lead.precio && lead.m2) {
+      // Fallback: Si es su primer lead, usamos su propio ratio
+      avgPrecioM2 = Math.round(lead.precio / lead.m2);
+    }
+
+    const valorEstimado = (lead.m2 && avgPrecioM2) ? (lead.m2 * avgPrecioM2) : 0;
+
+    // ==========================================
+    // 3. CONSTRUCCIÓN DEL PDF PREMIUM
+    // ==========================================
     const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([595.28, 841.89]); // Tamaño A4 estándar
+    const page = pdfDoc.addPage([595.28, 841.89]); // A4
     const { width, height } = page.getSize();
 
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
     const kavoxColor = rgb(0 / 255, 135 / 255, 153 / 255); // #008799
-    const textColor = rgb(0.2, 0.2, 0.2);
+    const darkGray = rgb(0.2, 0.2, 0.2);
+    const lightGray = rgb(0.95, 0.95, 0.95);
 
-    // Cabecera Corporativa
+    // --- CABECERA ---
     page.drawRectangle({ x: 0, y: height - 100, width: width, height: 100, color: kavoxColor });
     page.drawText(agencia?.nombre_empresa?.toUpperCase() || 'AGENCIA INMOBILIARIA', {
-      x: 50, y: height - 55, size: 24, font: fontBold, color: rgb(1, 1, 1),
+      x: 40, y: height - 50, size: 22, font: fontBold, color: rgb(1, 1, 1)
     });
-    page.drawText('Análisis Comparativo de Mercado (CMA)', {
-      x: 50, y: height - 75, size: 12, font: fontRegular, color: rgb(1, 1, 1),
+    page.drawText('Dossier de Captación & Análisis de Mercado', {
+      x: 40, y: height - 75, size: 12, font: fontRegular, color: rgb(1, 1, 1)
     });
 
-    // Título Inmueble
-    page.drawText(lead.titulo || 'Propiedad Captada', { x: 50, y: height - 150, size: 18, font: fontBold, color: textColor });
-    page.drawText(`Dirección: ${lead.direccion || 'Ubicación reservada'}`, { x: 50, y: height - 170, size: 11, font: fontRegular, color: textColor });
+    // --- TÍTULO Y DIRECCIÓN ---
+    page.drawText(lead.titulo || 'Inmueble Captado', { 
+      x: 40, y: height - 150, size: 16, font: fontBold, color: darkGray 
+    });
+    page.drawText(`📍 ${lead.direccion || 'Ubicación reservada'}`, { 
+      x: 40, y: height - 175, size: 11, font: fontRegular, color: rgb(0.4, 0.4, 0.4) 
+    });
 
-    // Bloque de Valoración (Datos Duros)
-    const precio = lead.precio ? `${lead.precio.toLocaleString('es-ES')} €` : 'No disponible';
-    const m2 = lead.m2 ? `${lead.m2} m²` : 'N/D';
-    const precioM2 = (lead.precio && lead.m2) ? `${Math.round(lead.precio / lead.m2).toLocaleString('es-ES')} €/m²` : 'N/D';
+    // --- FOTO DEL INMUEBLE (OPCIÓN ROBUSTA CON FALLBACK) ---
+    let imageDrawn = false;
+    if (lead.foto) {
+      try {
+        const imageResponse = await fetch(lead.foto, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+        const imageBuffer = await imageResponse.arrayBuffer();
 
-    page.drawText(`Precio de Salida: ${precio}`, { x: 50, y: height - 220, size: 14, font: fontBold, color: kavoxColor });
-    page.drawText(`Superficie: ${m2}`, { x: 50, y: height - 240, size: 12, font: fontRegular, color: textColor });
-    page.drawText(`Ratio €/m² actual: ${precioM2}`, { x: 50, y: height - 260, size: 12, font: fontRegular, color: textColor });
+        let imageToEmbed;
+        // pdf-lib solo soporta JPG y PNG. Idealista a veces envía WEBP, esto protege la app.
+        if (lead.foto.toLowerCase().includes('.png')) {
+          imageToEmbed = await pdfDoc.embedPng(imageBuffer);
+        } else {
+          imageToEmbed = await pdfDoc.embedJpg(imageBuffer);
+        }
 
-    page.drawText(`Habitaciones: ${lead.habitaciones || '-'} | Baños: ${lead.banos || '-'} | Planta: ${lead.planta || '-'}`, { x: 50, y: height - 280, size: 12, font: fontRegular, color: textColor });
+        page.drawImage(imageToEmbed, {
+          x: 40, y: height - 400, width: 250, height: 180,
+        });
+        imageDrawn = true;
+      } catch (e) {
+        imageDrawn = false; // Falló la descarga o el formato es incompatible
+      }
+    }
 
-    // Sección de cierre
-    page.drawText("Estimación inicial generada por el radar tecnológico KAVOX.", {
-      x: 50, y: 50, size: 10, font: fontRegular, color: rgb(0.5, 0.5, 0.5),
+    if (!imageDrawn) {
+      // Bloque "Datos Protegidos" (Opción 2 solicitada)
+      page.drawRectangle({ x: 40, y: height - 400, width: 250, height: 180, color: lightGray });
+      page.drawText("DATOS PROTEGIDOS", { x: 90, y: height - 310, size: 14, font: fontBold, color: rgb(0.6,0.6,0.6) });
+      page.drawText("Imagen bloqueada por el origen", { x: 70, y: height - 330, size: 10, font: fontRegular, color: rgb(0.6,0.6,0.6) });
+    }
+
+    // --- DATOS DEL INMUEBLE (Columna Derecha) ---
+    const startY = height - 220;
+    page.drawText('Características de la Propiedad', { x: 310, y: startY, size: 14, font: fontBold, color: kavoxColor });
+
+    const details = [
+      `Precio Publicado: ${lead.precio ? lead.precio.toLocaleString('es-ES') + ' €' : 'N/D'}`,
+      `Superficie: ${lead.m2 ? lead.m2 + ' m²' : 'N/D'}`,
+      `Habitaciones: ${lead.habitaciones || '-'}`,
+      `Baños: ${lead.banos || '-'}`,
+      `Planta: ${lead.planta || '-'}`,
+      `Estado actual: En Comercialización`
+    ];
+
+    details.forEach((text, i) => {
+      page.drawText(`• ${text}`, { x: 310, y: startY - 30 - (i * 25), size: 11, font: fontRegular, color: darkGray });
+    });
+
+    // --- SECCIÓN: ANÁLISIS DE MERCADO REAL ---
+    page.drawRectangle({ x: 40, y: height - 600, width: width - 80, height: 140, color: lightGray });
+
+    page.drawText('Análisis Comparativo de Mercado (CMA)', { x: 60, y: height - 490, size: 14, font: fontBold, color: kavoxColor });
+
+    page.drawText(`Basado en ${comparables ? comparables.length : 1} testigos captados recientemente en esta zona.`, { 
+      x: 60, y: height - 510, size: 10, font: fontRegular, color: rgb(0.4, 0.4, 0.4) 
+    });
+
+    page.drawText('Valor Medio M² en la zona:', { x: 60, y: height - 540, size: 12, font: fontBold, color: darkGray });
+    page.drawText(`${avgPrecioM2.toLocaleString('es-ES')} €/m²`, { x: 60, y: height - 565, size: 20, font: fontBold, color: kavoxColor });
+
+    if (valorEstimado > 0) {
+      page.drawText('Valor Estimado del Inmueble:', { x: 310, y: height - 540, size: 12, font: fontBold, color: darkGray });
+      page.drawText(`${valorEstimado.toLocaleString('es-ES')} €`, { x: 310, y: height - 565, size: 20, font: fontBold, color: rgb(0.86, 0.15, 0.15) }); // Color rojo/alerta para contraste
+    } else {
+      page.drawText('Faltan datos de M² para estimación.', { x: 310, y: height - 565, size: 12, font: fontRegular, color: darkGray });
+    }
+
+    // --- PIE DE PÁGINA (CTA) ---
+    page.drawRectangle({ x: 0, y: 0, width: width, height: 60, color: darkGray });
+    page.drawText('Este informe es automático. Para una tasación oficial y un plan de venta garantizado, contáctanos.', {
+      x: 60, y: 25, size: 10, font: fontRegular, color: rgb(1, 1, 1)
     });
 
     const pdfBytes = await pdfDoc.save();
 
-    // 3. Subir a Supabase Storage
+    // ==========================================
+    // 4. SUBIR A STORAGE Y GUARDAR URL
+    // ==========================================
     const fileName = `${id_agencia}/cma_${id_anuncio}_${Date.now()}.pdf`;
-
-    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+    const { error: uploadError } = await supabaseAdmin.storage
       .from('informes_cma')
       .upload(fileName, pdfBytes, { contentType: 'application/pdf', upsert: true });
 
     if (uploadError) throw uploadError;
 
-    // 4. Obtener URL pública y actualizar la BD
     const { data: publicUrlData } = supabaseAdmin.storage.from('informes_cma').getPublicUrl(fileName);
     const pdfUrl = publicUrlData.publicUrl;
 
