@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { Send, Smartphone, X, MapPin, ExternalLink, Phone, ShieldAlert, ShieldCheck, Clock } from "lucide-react";
+import { Send, Smartphone, X, MapPin, ExternalLink, Phone } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { updateLeadStatus } from "./actions";
 
@@ -24,7 +24,6 @@ type LeadData = {
   url: string;
   foto: string;
   estado: string;
-  lista_robinson: string; // <--- NUEVO CAMPO
   created_at: string;
 };
 
@@ -63,7 +62,6 @@ export default function DashboardPage() {
 
           if (trackersData) setTrackers(trackersData);
 
-          // ⚠️ ALERTA: Traemos la columna lista_robinson
           const { data: leadsData } = await supabase
             .from("propiedades_rastreadas")
             .select("*")
@@ -173,7 +171,6 @@ export default function DashboardPage() {
                     <th className="p-4 font-medium">Inmueble</th>
                     <th className="p-4 font-medium">Precio</th>
                     <th className="p-4 font-medium">Contacto</th>
-                    <th className="p-4 font-medium">Lista Robinson</th>
                     <th className="p-4 font-medium">Estado</th>
                   </tr>
                 </thead>
@@ -203,24 +200,6 @@ export default function DashboardPage() {
                           <Phone className="w-4 h-4 text-slate-500" />
                           {lead.telefono}
                         </div>
-                      </td>
-                      {/* ⚠️ COLUMNA LISTA ROBINSON */}
-                      <td className="p-4">
-                        {lead.lista_robinson === 'SI' && (
-                          <div className="flex items-center gap-1.5 text-red-700 bg-red-50 border border-red-200 px-2 py-1 rounded-md text-xs font-bold w-fit">
-                            <ShieldAlert className="w-3.5 h-3.5" /> PELIGRO (SÍ)
-                          </div>
-                        )}
-                        {lead.lista_robinson === 'NO' && (
-                          <div className="flex items-center gap-1.5 text-green-700 bg-green-50 border border-green-200 px-2 py-1 rounded-md text-xs font-bold w-fit">
-                            <ShieldCheck className="w-3.5 h-3.5" /> LIMPIO (NO)
-                          </div>
-                        )}
-                        {(!lead.lista_robinson || lead.lista_robinson === 'PROCESANDO') && (
-                          <div className="flex items-center gap-1.5 text-yellow-700 bg-yellow-50 border border-yellow-200 px-2 py-1 rounded-md text-xs font-bold w-fit">
-                            <Clock className="w-3.5 h-3.5" /> PROCESANDO
-                          </div>
-                        )}
                       </td>
                       <td className="p-4">
                         <select 

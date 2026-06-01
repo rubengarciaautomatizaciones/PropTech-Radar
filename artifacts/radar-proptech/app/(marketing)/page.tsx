@@ -3,7 +3,7 @@
 
 import { useState, useTransition } from "react";
 import { joinWaitlist } from "./actions/waitlist";
-import { Zap, FileText, ShieldAlert, Cpu, Database, ChevronRight, CheckCircle2, Linkedin } from "lucide-react";
+import { Zap, FileText, Cpu, Database, ChevronRight, CheckCircle2, Linkedin, Smartphone } from "lucide-react";
 
 export default function PriestleyWaitlistLanding() {
   const [isPending, startTransition] = useTransition();
@@ -66,7 +66,7 @@ export default function PriestleyWaitlistLanding() {
               El radar sub-segundo que va a jubilar a tu CRM actual.
             </h1>
             <p className="mt-6 text-lg md:text-xl text-kavox-muted max-w-3xl leading-relaxed">
-              KAVOX es la infraestructura táctica que detecta inmuebles de particulares en la Golden Hour, cruza la Lista Robinson, y te envía la alerta al móvil. Conviértete en la primera llamada de tu código postal.
+              KAVOX es la infraestructura táctica que detecta inmuebles de particulares en la Golden Hour, y te envía la alerta directa al móvil. Conviértete en la primera llamada de tu código postal.
             </p>
 
             <button 
@@ -117,7 +117,7 @@ export default function PriestleyWaitlistLanding() {
                 <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
                   <Zap className="w-6 h-6 text-kavox-accent mb-6" />
                   <h3 className="font-heading font-medium text-xl text-kavox-body mb-4">Velocidad Táctica</h3>
-                  <p className="text-kavox-muted leading-relaxed">Tu competencia actualiza la pestaña a mano. KAVOX te avisa al móvil en milisegundos evadiendo bloqueos en tiempo real.</p>
+                  <p className="text-kavox-muted leading-relaxed">Tu competencia actualiza la pestaña a mano. KAVOX extrae el dato en milisegundos evadiendo bloqueos antibot en tiempo real.</p>
                 </div>
                 <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
                   <FileText className="w-6 h-6 text-kavox-accent mb-6" />
@@ -125,9 +125,9 @@ export default function PriestleyWaitlistLanding() {
                   <p className="text-kavox-muted leading-relaxed">Genera un estudio de mercado durante el tono de llamada. Pasa de puerta fría a auditoría incontestable en 3 segundos.</p>
                 </div>
                 <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-                  <ShieldAlert className="w-6 h-6 text-kavox-accent mb-6" />
-                  <h3 className="font-heading font-medium text-xl text-kavox-body mb-4">Escudo LOPD</h3>
-                  <p className="text-kavox-muted leading-relaxed">Filtro automático de la Lista Robinson. Prospecta con agresividad comercial, pero con total inmunidad legal.</p>
+                  <Smartphone className="w-6 h-6 text-kavox-accent mb-6" />
+                  <h3 className="font-heading font-medium text-xl text-kavox-body mb-4">Alerta Directa al Móvil</h3>
+                  <p className="text-kavox-muted leading-relaxed">Cuando un particular sube un inmueble, entra a tu CRM y el móvil de tus agentes vibra al segundo. Sin iniciar sesión, sin demoras.</p>
                 </div>
               </div>
             </div>
@@ -253,8 +253,8 @@ export default function PriestleyWaitlistLanding() {
                 <div className="space-y-3">
                   {[
                     "A: Robar el 'First-to-Call' (ser siempre el primero en llamar).",
-                    "B: Evitar multas LOPD / cruzar Lista Robinson automáticamente.",
-                    "C: Automatizar las alertas al móvil de todo mi equipo comercial."
+                    "B: Recibir la alerta en el móvil antes de que mi equipo encienda el ordenador.",
+                    "C: Automatizar el flujo de trabajo de todo mi equipo comercial."
                   ].map((option) => (
                     <button 
                       key={option}

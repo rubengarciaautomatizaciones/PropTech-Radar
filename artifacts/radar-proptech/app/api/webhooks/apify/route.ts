@@ -98,6 +98,7 @@ export async function POST(request: Request) {
           const foto = prop.basicInfo?.thumbnail || prop.multimedia?.images?.[0]?.url || "";
           const telefono = prop.contactInfo?.phone1?.phoneNumber || "Oculto";
 
+          // QUERYS LIMPIAS (Sin la lista Robinson)
           const { error: insertError } = await supabaseAdmin.from('propiedades_rastreadas').insert({
             id_anuncio: idAnuncio,
             id_agencia: rastreador.id_agencia,
@@ -107,8 +108,7 @@ export async function POST(request: Request) {
             url: urlInmueble,
             precio: precio,
             foto: foto,
-            telefono: telefono, // <--- LA COMA QUE FALTABA
-            lista_robinson: 'PROCESANDO'
+            telefono: telefono
           });
 
           if (insertError) continue;
