@@ -1,3 +1,4 @@
+// artifacts/radar-proptech/app/api/webhooks/apify/route.ts
 import { NextResponse } from 'next/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 
@@ -19,7 +20,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const datasetId = body.resource?.defaultDatasetId;
-    const runId = body.resource?.id; // <-- ID de la ejecución
+    const runId = body.resource?.id;
 
     if (!datasetId || !runId) {
       return NextResponse.json({ error: "No dataset ID o Run ID" }, { status: 400 });
@@ -33,7 +34,6 @@ export async function POST(request: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // 1. Averiguar qué URL originó este Run consultando a Apify
     const runResponse = await fetch(`https://api.apify.com/v2/actor-runs/${runId}?token=${apifyToken}`);
     if (!runResponse.ok) {
         return NextResponse.json({ error: "Failed to fetch run details" }, { status: 500 });
@@ -41,7 +41,6 @@ export async function POST(request: Request) {
     const runDetails = await runResponse.json();
     const inputStartUrls = runDetails.data?.buildOptions?.input?.startUrls || runDetails.data?.options?.input?.startUrls || [];
 
-    // Si no logramos leer la URL original de las opciones (fallback seguro leyendo el defaultKeyValueStore)
     let sourceUrl = inputStartUrls[0]?.url || inputStartUrls[0];
 
     if (!sourceUrl) {
@@ -57,7 +56,6 @@ export async function POST(request: Request) {
 
     const normalizedSourceUrl = normalizeUrl(sourceUrl);
 
-    // 2. Traer SOLO los rastreadores cuya URL coincide con la que originó el Run
     const { data: configs } = await supabaseAdmin
       .from('configuracion_rastreo')
       .select('id_agencia, url_idealista, telegram_chat_id, nombre_rastreo')
@@ -70,7 +68,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, message: "No hay agencias rastreando esta URL actualmente." });
     }
 
-    // 3. Descargamos el dataset
     const datasetResponse = await fetch(`https://api.apify.com/v2/datasets/${datasetId}/items?token=${apifyToken}`);
     const propiedades = await datasetResponse.json();
 
@@ -78,20 +75,15 @@ export async function POST(request: Request) {
     let descartadosInmobiliaria = 0;
 
     for (const prop of propiedades) {
-      // 4. EL ESCUDO ANTICOMPETENCIA
       if (prop.contactInfo?.userType !== "private") {
         descartadosInmobiliaria++;
         continue;
       }
 
-      
-
       const idAnuncio = String(prop.adid);
 
-      // Solo iteramos sobre los rastreadores legítimos de esta búsqueda
       for (const rastreador of validTrackers) {
 
-        // Comprobar si ya existe para esta agencia
         const { data: existe } = await supabaseAdmin
           .from('propiedades_rastreadas')
           .select('id_anuncio')
@@ -115,13 +107,12 @@ export async function POST(request: Request) {
             url: urlInmueble,
             precio: precio,
             foto: foto,
-            telefono: telefono
+            telefono: telefono, // <--- LA COMA QUE FALTABA
             lista_robinson: 'PROCESANDO'
           });
 
           if (insertError) continue;
 
-          // ENVIAMOS A TELEGRAM
           if (botToken && rastreador.telegram_chat_id) {
             const precioFormateado = Number(precio).toLocaleString('es-ES');
             const nombreContacto = prop.contactInfo?.contactName || 'Particular';
