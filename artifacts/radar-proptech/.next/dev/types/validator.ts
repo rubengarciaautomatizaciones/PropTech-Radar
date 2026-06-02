@@ -74,6 +74,24 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../../app/(marketing)/legal/privacidad/page.tsx
+{
+  type __IsExpected<Specific extends AppPageConfig<"/legal/privacidad">> = Specific
+  const handler = {} as typeof import("../../../app/(marketing)/legal/privacidad/page.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../../app/(marketing)/legal/terminos/page.tsx
+{
+  type __IsExpected<Specific extends AppPageConfig<"/legal/terminos">> = Specific
+  const handler = {} as typeof import("../../../app/(marketing)/legal/terminos/page.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../../app/(marketing)/page.tsx
 {
   type __IsExpected<Specific extends AppPageConfig<"/">> = Specific
@@ -119,6 +137,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../../app/dashboard/profile/page.tsx
+{
+  type __IsExpected<Specific extends AppPageConfig<"/dashboard/profile">> = Specific
+  const handler = {} as typeof import("../../../app/dashboard/profile/page.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../../app/dashboard/team/page.tsx
 {
   type __IsExpected<Specific extends AppPageConfig<"/dashboard/team">> = Specific
@@ -132,6 +159,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/callback">> = Specific
   const handler = {} as typeof import("../../../app/(auth)/callback/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../../app/api/cma/generate/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/cma/generate">> = Specific
+  const handler = {} as typeof import("../../../app/api/cma/generate/route.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check

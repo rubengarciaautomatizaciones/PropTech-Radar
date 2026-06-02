@@ -2,8 +2,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { addRadarUpfrontCharge, updateRadar, deleteRadar } from "./actions"; // <--- CAMBIO IMPORTANTE AQUÍ
-import { PlusCircle, Target, Pencil, Trash2, Check, X, ShieldAlert, Link as LinkIcon, Info } from "lucide-react";
+import { addRadarUpfrontCharge, updateRadar, deleteRadar } from "./actions";
+import { PlusCircle, Target, Pencil, Trash2, Check, X, Link as LinkIcon, Info, ShoppingCart } from "lucide-react";
 
 type Radar = {
   id: string;
@@ -42,6 +42,26 @@ export default function ManageRadars({ initialRadars }: { initialRadars: Radar[]
     });
   };
 
+  // NUEVO: Comprar un radar de emergencia vacío
+  const handleBuyEmergencyRadar = () => {
+    setMessage(null);
+    if (!confirm("Se creará un nuevo radar y se cargará el importe en tu suscripción de Stripe. ¿Proceder?")) return;
+
+    startTransition(async () => {
+      const formData = new FormData();
+      // Le ponemos un nombre y URL dummy para que se cree, el usuario ya lo editará
+      formData.append("nombreRastreo", "Nueva Zona (Por Configurar)");
+      formData.append("idealistaUrl", "https://www.idealista.com");
+
+      const result = await addRadarUpfrontCharge(formData);
+      if (result?.error) setMessage({ text: result.error, type: "error" });
+      else if (result?.success) {
+        setMessage({ text: "¡Radar comprado! Ahora edítalo para ponerle tu URL.", type: "success" });
+        setEditingId(null); // Cerramos el modo edición por si acaso
+      }
+    });
+  };
+
   const handleSaveEdit = (id: string) => {
     startTransition(async () => {
       const result = await updateRadar(id, editName, editUrl);
@@ -63,7 +83,6 @@ export default function ManageRadars({ initialRadars }: { initialRadars: Radar[]
     });
   };
 
-  // Función para calcular cuántos cambios le quedan al usuario (30 días rodantes)
   const getRemainingChanges = (history?: string[]) => {
     if (!history) return 3;
     const thirtyDaysAgo = new Date();
@@ -96,7 +115,6 @@ export default function ManageRadars({ initialRadars }: { initialRadars: Radar[]
               <li key={radar.id} className="p-5 flex flex-col hover:bg-slate-50 transition-colors gap-4">
 
                 {isEditing ? (
-                  // MODO EDICIÓN
                   <div className="w-full space-y-4">
                     <div className="flex justify-between items-center mb-2">
                       <span className="font-bold text-slate-900 text-lg">Modo Edición</span>
@@ -112,7 +130,7 @@ export default function ManageRadars({ initialRadars }: { initialRadars: Radar[]
                         <input 
                           value={editName} 
                           onChange={(e) => setEditName(e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-kavox-accent"
                         />
                       </div>
                       <div>
@@ -126,23 +144,34 @@ export default function ManageRadars({ initialRadars }: { initialRadars: Radar[]
                           value={editUrl} 
                           onChange={(e) => setEditUrl(e.target.value)}
                           disabled={remainingChanges === 0 && editUrl !== radar.url_idealista}
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-kavox-accent disabled:bg-gray-100 disabled:text-gray-500"
                         />
+
+                        {/* AÑADIDO: El botón de emergencia para comprar radar si se bloquea la URL */}
                         {remainingChanges === 0 && editUrl !== radar.url_idealista && (
-                          <p className="text-xs text-red-500 mt-1">Has alcanzado el límite de 3 cambios en los últimos 30 días.</p>
+                          <div className="mt-3 p-3 bg-red-50 border border-red-100 rounded-lg flex flex-col gap-3">
+                            <p className="text-xs text-red-600 font-medium">Has alcanzado el límite estricto de 3 cambios en los últimos 30 días para este radar.</p>
+                            <button 
+                              onClick={handleBuyEmergencyRadar}
+                              disabled={isPending}
+                              className="bg-red-600 text-white hover:bg-red-700 w-full py-2 rounded-md text-xs font-bold shadow-sm transition-colors flex items-center justify-center gap-2"
+                            >
+                              <ShoppingCart className="w-4 h-4" />
+                              Comprar un radar nuevo para esta zona
+                            </button>
+                          </div>
                         )}
                       </div>
                     </div>
                   </div>
                 ) : (
-                  // MODO VISTA
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-4">
                     <div className="flex-1 space-y-2 w-full min-w-0">
                       <div className="flex items-center gap-3">
                         <span className="font-bold text-slate-900 text-lg">{radar.nombre_rastreo}</span>
                         <button 
                           onClick={() => { setEditingId(radar.id); setEditName(radar.nombre_rastreo); setEditUrl(radar.url_idealista); }}
-                          className="text-gray-400 hover:text-blue-600 transition-colors bg-gray-100 p-1.5 rounded-md"
+                          className="text-gray-400 hover:text-kavox-accent transition-colors bg-gray-100 p-1.5 rounded-md"
                           title="Editar radar"
                         >
                           <Pencil className="w-4 h-4" />
@@ -170,15 +199,15 @@ export default function ManageRadars({ initialRadars }: { initialRadars: Radar[]
         </ul>
       </div>
 
-      {/* FORMULARIO PARA AÑADIR NUEVO */}
+      {/* FORMULARIO PARA AÑADIR NUEVO NORMAL */}
       <div className="bg-slate-50 p-6 rounded-xl border border-dashed border-gray-300">
         <div className="flex items-center gap-3 mb-4">
-          <Target className="w-6 h-6 text-blue-600" />
+          <Target className="w-6 h-6 text-kavox-accent" />
           <h2 className="text-lg font-bold text-slate-900">Añadir Nueva Zona (Radar)</h2>
         </div>
 
-        <div className="bg-blue-50/50 border border-blue-100 rounded-lg p-4 mb-6 flex items-start gap-3 text-sm text-blue-800">
-          <Info className="w-5 h-5 shrink-0 mt-0.5" />
+        <div className="bg-kavox-accent/10 border border-kavox-accent/20 rounded-lg p-4 mb-6 flex items-start gap-3 text-sm text-kavox-body">
+          <Info className="w-5 h-5 shrink-0 mt-0.5 text-kavox-accent" />
           <p>
             Al añadir un nuevo radar, se cargará el importe a tu tarjeta guardada. Por seguridad, <strong>la URL de los radares solo puede modificarse un máximo de 3 veces cada 30 días</strong>.
           </p>
@@ -191,7 +220,7 @@ export default function ManageRadars({ initialRadars }: { initialRadars: Radar[]
               type="text"
               value={nombreRastreo}
               onChange={(e) => setNombreRastreo(e.target.value)}
-              className="w-full p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600" 
+              className="w-full p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-kavox-accent" 
             />
           </div>
           <div>
@@ -200,7 +229,7 @@ export default function ManageRadars({ initialRadars }: { initialRadars: Radar[]
               type="url"
               value={idealistaUrl}
               onChange={(e) => setIdealistaUrl(e.target.value)}
-              className="w-full p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600" 
+              className="w-full p-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-kavox-accent" 
             />
           </div>
         </div>
