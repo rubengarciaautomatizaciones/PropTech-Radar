@@ -1,4 +1,5 @@
-import { LayoutDashboard, Users, Settings, CreditCard } from "lucide-react";
+// artifacts/radar-proptech/app/dashboard/layout.tsx
+import { LayoutDashboard, Users, Settings, CreditCard, User } from "lucide-react";
 import Sidebar, { type NavLink } from "@/components/Sidebar";
 import { createClient } from "@/lib/supabase/server";
 
@@ -10,7 +11,7 @@ export default async function DashboardLayout({
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  let rol = "agente"; // Por defecto, el rol más restrictivo
+  let rol = "agente";
 
   if (user) {
     const { data: userData } = await supabase
@@ -22,9 +23,9 @@ export default async function DashboardLayout({
     if (userData) rol = userData.rol;
   }
 
-  // Menú dinámico basado en el rol (admin y dios ven todo)
   const navLinks: NavLink[] = [
     { href: "/dashboard", label: "Panel Principal", icon: LayoutDashboard },
+    { href: "/dashboard/profile", label: "Mi Perfil", icon: User }, // NUEVO ENLACE
     ...(rol === 'admin' || rol === 'dios' ? [
       { href: "/dashboard/team",      label: "Equipo",          icon: Users },
       { href: "/dashboard/config",    label: "Configuración",   icon: Settings },
