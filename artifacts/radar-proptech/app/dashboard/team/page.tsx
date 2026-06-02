@@ -1,3 +1,4 @@
+// artifacts/radar-proptech/app/dashboard/team/page.tsx
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createAdminClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
@@ -9,28 +10,25 @@ export default async function TeamRouter() {
 
   if (!user) return redirect("/login");
 
-  // Obtener datos del usuario logueado
   const { data: adminData } = await supabase
     .from("usuarios")
     .select("id_agencia, rol")
     .eq("id_usuario", user.id)
     .single();
 
-  // Expulsar si no es admin ni dios
   if (!adminData || (adminData.rol !== "admin" && adminData.rol !== "dios")) {
     return redirect("/dashboard"); 
   }
 
-  // ⚠️ LA LLAVE MAESTRA: Usamos el cliente Admin para poder leer las filas de todo el equipo
   const supabaseAdmin = createAdminClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  // Obtener todos los usuarios de esa misma agencia saltándonos el RLS de lectura
+  // AÑADIDO: 'nombre' en el select
   const { data: teamMembers } = await supabaseAdmin
     .from("usuarios")
-    .select("id_usuario, rol")
+    .select("id_usuario, rol, nombre")
     .eq("id_agencia", adminData.id_agencia);
 
   return (

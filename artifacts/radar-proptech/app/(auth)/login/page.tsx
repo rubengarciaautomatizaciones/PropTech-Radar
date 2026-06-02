@@ -1,17 +1,20 @@
 // artifacts/radar-proptech/app/(auth)/login/page.tsx
 import { signIn } from "../actions/login";
 
-export default function LoginPage({ searchParams }: { searchParams: { message: string } }) {
+export default async function LoginPage({ searchParams }: { searchParams: { message?: string, email?: string } }) {
+  // En Next.js 15, searchParams es asíncrono
+  const params = await searchParams;
+
   return (
     <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 border border-gray-100">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-slate-900">Iniciar Sesión</h1>
-        <p className="text-gray-500 mt-2">Accede a tu panel de Radar PropTech</p>
+        <p className="text-gray-500 mt-2">Accede a tu panel de KAVOX</p>
       </div>
 
-      {searchParams.message && (
+      {params.message && (
         <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-lg text-sm text-center">
-          {searchParams.message}
+          {params.message}
         </div>
       )}
 
@@ -24,8 +27,9 @@ export default function LoginPage({ searchParams }: { searchParams: { message: s
             id="email"
             name="email"
             type="email"
+            defaultValue={params.email || ""} // <-- AQUÍ PRE-RELLENAMOS EL EMAIL
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kavox-accent focus:border-transparent outline-none"
             placeholder="tu@agencia.com"
           />
         </div>
@@ -39,21 +43,21 @@ export default function LoginPage({ searchParams }: { searchParams: { message: s
             name="password"
             type="password"
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kavox-accent focus:border-transparent outline-none"
             placeholder="••••••••"
           />
         </div>
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          className="w-full bg-kavox-body text-white font-semibold py-3 rounded-lg hover:bg-black transition-colors"
         >
           Acceder
         </button>
       </form>
 
       <div className="mt-6 text-center text-sm text-gray-600">
-        ¿No tienes cuenta? <a href="/signup" className="text-blue-600 font-semibold hover:underline">Regístrate</a>
+        ¿No tienes cuenta? <a href="/signup" className="text-kavox-accent font-semibold hover:underline">Regístrate</a>
       </div>
     </div>
   );
