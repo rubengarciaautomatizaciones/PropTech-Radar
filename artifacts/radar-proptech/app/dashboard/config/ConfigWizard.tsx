@@ -79,13 +79,13 @@ export default function ConfigWizard({ initialAgencyName = "" }: { initialAgency
           <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">URL de Idealista</label>
               <input 
-                type="url"
-                value={idealistaUrl}
-                onChange={(e) => setIdealistaUrl(e.target.value)}
+                type="url" value={idealistaUrl} onChange={(e) => setIdealistaUrl(e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-600" 
                 placeholder="https://www.idealista.com/..." 
               />
-              <p className="text-xs text-gray-400 mt-1">Pega el enlace con los filtros exactos aplicados en Idealista.</p>
+              <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-amber-800 text-xs font-medium leading-relaxed">
+                ⚠️ <strong>IMPORTANTE:</strong> Para que el radar funcione correctamente en tiempo real, antes de copiar el enlace en Idealista, debes hacer clic en "Ordenar por" y seleccionar <strong>"Más recientes"</strong>.
+              </div>
           </div>
 
           <div className="flex gap-3 pt-2">

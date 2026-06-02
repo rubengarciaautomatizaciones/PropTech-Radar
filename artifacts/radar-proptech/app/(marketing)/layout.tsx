@@ -32,9 +32,9 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-sm text-kavox-muted">
           <p>KAVOX. Tecnología de interceptación B2B para Real Estate.</p>
           <div className="flex gap-6 mt-4 md:mt-0">
-            <Link href="#" className="hover:text-kavox-body">Aviso Legal</Link>
-            <Link href="#" className="hover:text-kavox-body">Privacidad</Link>
-            <Link href="#" className="hover:text-kavox-body">Contacto</Link>
+            <Link href="/legal/terminos" className="hover:text-kavox-body">Términos y Condiciones</Link>
+            <Link href="/legal/privacidad" className="hover:text-kavox-body">Política de Privacidad</Link>
+            <a href="mailto:info@kavox.tech" className="hover:text-kavox-body">Contacto</a>
           </div>
         </div>
       </footer>

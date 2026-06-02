@@ -277,19 +277,29 @@ export default function DashboardPage() {
             <button onClick={() => setSelectedTrackerId(null)} className="absolute top-4 right-4 p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"><X className="w-5 h-5" /></button>
             <div className="text-center mb-6 mt-2">
               <h2 className="text-xl font-bold text-slate-900">Conecta tu Grupo</h2>
-              <p className="text-gray-500 mt-2 text-sm">Escanea este código para vincular un chat de Telegram a esta zona específica.</p>
+              <p className="text-gray-500 mt-2 text-sm">Sigue estos pasos para recibir alertas en tu equipo.</p>
             </div>
-            <div className="flex flex-col items-center space-y-6">
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                <QRCodeSVG value={telegramLink} size={200} level={"H"} includeMargin={true} />
+            <div className="flex flex-col items-center space-y-4">
+              <div className="space-y-4 w-full px-2">
+                <div className="flex gap-3 items-start">
+                  <span className="bg-kavox-accent text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5">1</span> 
+                  <p className="text-sm font-medium text-slate-700">Abre Telegram y crea un <strong>Nuevo Grupo</strong> (Ej: "Radar Madrid"). Mete a tus comerciales en él.</p>
+                </div>
+                <div className="flex gap-3 items-start">
+                  <span className="bg-kavox-accent text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5">2</span> 
+                  <p className="text-sm font-medium text-slate-700">Añade a nuestro bot al grupo. Búscalo como: <br/><strong className="text-kavox-accent select-all">@RadarPropTech_bot</strong></p>
+                </div>
+                <div className="flex gap-3 items-start">
+                  <span className="bg-kavox-accent text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5">3</span> 
+                  <div className="text-sm font-medium text-slate-700">Copia y envía este comando exacto dentro de tu nuevo grupo:
+                    <div className="mt-2 bg-slate-100 border border-slate-200 p-2 rounded text-xs font-mono select-all overflow-x-auto text-slate-800">
+                      /start {selectedTrackerId}
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="space-y-3 w-full px-2">
-                <p className="text-sm font-medium flex gap-3 items-center text-slate-700"><span className="bg-kavox-accent text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0">1</span> Abre la cámara o lector QR de tu móvil.</p>
-                <p className="text-sm font-medium flex gap-3 items-center text-slate-700"><span className="bg-kavox-accent text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0">2</span> Añade tu bot a un grupo y pega el enlace allí para tu equipo.</p>
-                <p className="text-sm font-medium flex gap-3 items-center text-slate-700"><span className="bg-kavox-accent text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0">3</span> Pulsa el botón <b className="text-slate-900">"INICIAR"</b>.</p>
-              </div>
-              <button onClick={() => window.location.reload()} className="w-full mt-2 bg-slate-900 text-white py-3 rounded-lg font-semibold hover:bg-slate-800 transition-colors">
-                Ya lo he conectado
+              <button onClick={() => window.location.reload()} className="w-full mt-4 bg-slate-900 text-white py-3 rounded-lg font-semibold hover:bg-slate-800 transition-colors">
+                Ya he enviado el comando
               </button>
             </div>
           </div>
