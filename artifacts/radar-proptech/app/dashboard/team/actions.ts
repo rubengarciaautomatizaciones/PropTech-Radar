@@ -4,7 +4,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createAdminClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers"; // Para sacar el dominio dinámico
+import { headers } from "next/headers"; 
 
 async function getAdminClient() {
   return createAdminClient(
@@ -39,7 +39,6 @@ export async function addAgent(formData: FormData) {
     return { error: "Solo los administradores pueden añadir equipo." };
   }
 
-  // Obtenemos el nombre de la empresa para ponerlo en el correo
   const { data: agencyData } = await supabaseAdmin
     .from("agencias")
     .select("nombre_empresa")
@@ -62,13 +61,60 @@ export async function addAgent(formData: FormData) {
 
   if (dbError) return { error: "Usuario creado, pero hubo un error al vincularlo." };
 
-  // === ENVÍO DEL CORREO DE ONBOARDING POR RESEND ===
+  // === ENVÍO DEL CORREO DE ONBOARDING POR RESEND (HTML INDESTRUCTIBLE) ===
   const resendKey = process.env.RESEND_API_KEY;
   if (resendKey) {
     try {
       const origin = (await headers()).get("origin") || "https://kavox.tech";
       const loginUrl = `${origin}/login?email=${encodeURIComponent(email)}`;
       const agencyName = agencyData?.nombre_empresa || "tu agencia";
+
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="utf-8">
+          <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+        </head>
+        <body style="background-color: #f3f4f6; padding: 40px 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f3f4f6;">
+            <tr>
+              <td align="center">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                  <tr>
+                    <td style="background-color: #008799; padding: 35px; text-align: center;">
+                      <h1 style="color: #ffffff; font-family: 'Space Grotesk', Helvetica, Arial, sans-serif; font-size: 32px; margin: 0; letter-spacing: 2px;">KAVOX</h1>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 40px 30px; color: #374151; font-size: 16px; line-height: 1.6;">
+                      <h2 style="font-size: 22px; color: #111827; margin-top: 0; margin-bottom: 20px;">Hola, ${name}</h2>
+                      <p style="margin-bottom: 20px;">El administrador de <strong>${agencyName}</strong> ha creado tu cuenta como Agente Comercial en el ecosistema KAVOX.</p>
+                      <p style="margin-bottom: 30px; padding: 15px; background-color: #f9fafb; border-radius: 6px; border: 1px solid #e5e7eb;">
+                        Tu correo de acceso es: <strong>${email}</strong><br>
+                        <strong>La contraseña temporal te la ha enviado tu administrador por canal privado.</strong>
+                      </p>
+                      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                          <td align="center">
+                            <a href="${loginUrl}" style="background-color: #111827; color: #ffffff; padding: 14px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">Iniciar Sesión en el CRM</a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 20px 30px 30px; text-align: center; color: #9ca3af; font-size: 13px; border-top: 1px solid #f3f4f6;">
+                      © 2025 KAVOX. Tecnología de interceptación B2B para Real Estate.
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
+      `;
 
       await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -77,50 +123,14 @@ export async function addAgent(formData: FormData) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'KAVOX System <hola@kavox.tech>', // Modifica si es necesario
+          from: 'KAVOX System <hola@kavox.tech>',
           to: email,
           subject: `Acceso concedido a KAVOX para ${agencyName}`,
-          html: `
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <style>
-                body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f9fafb; padding: 40px 0; margin: 0; }
-                .container { max-w-[600px]; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-                .header { background-color: #008799; text-align: center; padding: 40px 20px; }
-                .header img { max-width: 120px; height: auto; }
-                .content { padding: 40px; color: #111827; }
-                .title { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #111827; }
-                .text { font-size: 16px; line-height: 1.6; color: #4b5563; margin-bottom: 30px; }
-                .btn { display: inline-block; background-color: #111827; color: #ffffff !important; font-weight: bold; text-decoration: none; padding: 14px 28px; border-radius: 6px; font-size: 16px; }
-              </style>
-            </head>
-            <body>
-              <div class="container">
-                <div class="header">
-                  <img src="https://res.cloudinary.com/dd9plduuc/image/upload/v1780418666/KAVOX_1_dd9xyx.png" alt="KAVOX">
-                </div>
-                <div class="content">
-                  <div class="title">Hola, ${name}</div>
-                  <div class="text">
-                    El administrador de <strong>${agencyName}</strong> ha creado tu cuenta como Agente Comercial en el ecosistema KAVOX.
-                    <br><br>
-                    Tu correo de acceso es: <strong>${email}</strong><br>
-                    <strong>La contraseña temporal te la ha enviado tu administrador por canal privado.</strong>
-                  </div>
-                  <div style="text-align: center; margin-bottom: 30px;">
-                    <a href="${loginUrl}" class="btn">Iniciar Sesión en el CRM</a>
-                  </div>
-                </div>
-              </div>
-            </body>
-            </html>
-          `
+          html: htmlContent
         })
       });
     } catch (e) {
       console.error("Fallo al enviar correo a nuevo agente:", e);
-      // No bloqueamos el proceso aunque falle el correo
     }
   }
 
