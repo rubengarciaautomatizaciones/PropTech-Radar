@@ -25,7 +25,7 @@ export default async function DashboardLayout({
 
   const navLinks: NavLink[] = [
     { href: "/dashboard", label: "Panel Principal", icon: LayoutDashboard },
-    { href: "/dashboard/profile", label: "Mi Perfil", icon: User }, // NUEVO ENLACE
+    { href: "/dashboard/profile", label: "Mi Perfil", icon: User },
     ...(rol === 'admin' || rol === 'dios' ? [
       { href: "/dashboard/team",      label: "Equipo",          icon: Users },
       { href: "/dashboard/config",    label: "Configuración",   icon: Settings },
@@ -34,9 +34,11 @@ export default async function DashboardLayout({
   ];
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
+    <div className="h-screen w-full flex bg-kavox-surface overflow-hidden">
       <Sidebar navLinks={navLinks} />
-      <main className="flex-1 p-8 overflow-auto">{children}</main>
+      <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        {children}
+      </main>
     </div>
   );
 }
