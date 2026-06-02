@@ -3,22 +3,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { LayoutDashboard, Users, Settings, CreditCard, User, LogOut } from "lucide-react";
 import { signOut } from "@/app/(auth)/actions/login";
 
-export type NavLink = {
-  href: string;
-  label: string;
-  icon: LucideIcon;
-};
-
-type SidebarProps = {
-  navLinks: NavLink[];
-};
-
-export default function Sidebar({ navLinks }: SidebarProps) {
+export default function Sidebar({ rol }: { rol: string }) {
   const pathname = usePathname();
+
+  // Construimos los enlaces en el lado del cliente de forma segura
+  const navLinks = [
+    { href: "/dashboard", label: "Panel Principal", icon: LayoutDashboard },
+    { href: "/dashboard/profile", label: "Mi Perfil", icon: User },
+    ...(rol === 'admin' || rol === 'dios' ? [
+      { href: "/dashboard/team",      label: "Equipo",          icon: Users },
+      { href: "/dashboard/config",    label: "Configuración",   icon: Settings },
+      { href: "/dashboard/billing",   label: "Facturación",     icon: CreditCard },
+    ] : [])
+  ];
 
   return (
     <aside className="w-16 hover:w-64 transition-all duration-300 ease-in-out bg-slate-900 text-white flex flex-col group relative z-50 h-screen border-r border-slate-800 shrink-0">
