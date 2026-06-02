@@ -18,7 +18,9 @@ export default async function ConfigRouter() {
 
   const hasAgency = !!userData?.id_agencia;
 
-  // ⚠️ CORRECCIÓN TYPESCRIPT: Le decimos explícitamente que es un array
+  // Extraemos el nombre de la agencia que puso al registrarse en /signup
+  const agencyNameFromAuth = user.user_metadata?.agency_name || "";
+
   let radares: any[] = [];
 
   if (hasAgency) {
@@ -33,7 +35,8 @@ export default async function ConfigRouter() {
   return (
     <div className="max-w-5xl mx-auto animate-in fade-in duration-500">
       {!hasAgency ? (
-        <ConfigWizard />
+        // Le pasamos el nombre pre-cargado como prop
+        <ConfigWizard initialAgencyName={agencyNameFromAuth} />
       ) : (
         <ManageRadars initialRadars={radares} />
       )}

@@ -1,11 +1,14 @@
+// artifacts/radar-proptech/app/dashboard/config/ConfigWizard.tsx
 "use client";
 
 import { useState, useTransition } from "react";
 import { completeOnboarding } from "./actions";
 
-export default function ConfigWizard() {
+// Añadimos la prop para recibir el nombre pre-cargado
+export default function ConfigWizard({ initialAgencyName = "" }: { initialAgencyName?: string }) {
   const [step, setStep] = useState(1);
-  const [agencyName, setAgencyName] = useState("");
+  // Inicializamos el estado con la prop
+  const [agencyName, setAgencyName] = useState(initialAgencyName);
   const [nombreRastreo, setNombreRastreo] = useState("");
   const [idealistaUrl, setIdealistaUrl] = useState("");
   const [error, setError] = useState("");
