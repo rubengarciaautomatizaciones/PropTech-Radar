@@ -92,7 +92,7 @@ export async function addAgent(formData: FormData) {
                       <p style="margin-bottom: 20px;">El administrador de <strong>${agencyName}</strong> ha creado tu cuenta como Agente Comercial en el ecosistema KAVOX.</p>
                       <p style="margin-bottom: 30px; padding: 15px; background-color: #f9fafb; border-radius: 6px; border: 1px solid #e5e7eb;">
                         Tu correo de acceso es: <strong>${email}</strong><br>
-                        <strong>La contraseña temporal te la ha enviado tu administrador por canal privado.</strong>
+                        <strong>La contraseña te la ha enviado tu administrador por canal privado.</strong>
                       </p>
                       <table width="100%" cellpadding="0" cellspacing="0" border="0">
                         <tr>
