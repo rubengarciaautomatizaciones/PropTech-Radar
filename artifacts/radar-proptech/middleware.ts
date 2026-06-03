@@ -1,9 +1,8 @@
-// artifacts/radar-proptech/proxy.ts
-
+// artifacts/radar-proptech/middleware.ts
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -19,21 +18,33 @@ export async function proxy(request: NextRequest) {
         setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
           try {
             cookiesToSet.forEach(({ name, value, options }) => {
-              // ----- LA CORRECCIÓN ESTÁ AQUÍ -----
-              // La petición (request) solo necesita el nombre y el valor.
               request.cookies.set(name, value)
-              // La respuesta (response) necesita todo para enviarlo al navegador.
               supabaseResponse.cookies.set(name, value, options)
             })
           } catch (e) {
-            // Ignorar errores
+            // Ignorar errores en lectura
           }
         },
       },
     }
   )
 
-  await supabase.auth.getUser()
+  // Autenticamos la sesión actual
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const pathname = request.nextUrl.pathname;
+  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname.startsWith('/verify-email');
+  const isDashboardRoute = pathname.startsWith('/dashboard');
+
+  // 1. Si no hay usuario y quiere entrar al dashboard -> Al login
+  if (isDashboardRoute && !user) {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  // 2. Si hay usuario y quiere entrar a rutas de auth -> Al dashboard
+  if (isAuthRoute && user) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
 
   return supabaseResponse
 }
@@ -41,12 +52,7 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - /callback (LA RUTA DE AUTENTICACIÓN)
-     * - api (RUTAS PÚBLICAS PARA WEBHOOKS DE STRIPE, TELEGRAM, ETC)
+     * Ignora archivos estáticos, imágenes, favicon y webhooks (api)
      */
     '/((?!_next/static|_next/image|favicon.ico|callback|api|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],

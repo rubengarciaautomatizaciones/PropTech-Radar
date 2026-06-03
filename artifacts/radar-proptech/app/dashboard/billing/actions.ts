@@ -50,7 +50,7 @@ export async function redirectToCustomerPortal() {
     const subscription = await stripe.subscriptions.retrieve(agencia.plan_stripe_id);
     const customerId = subscription.customer as string;
 
-    const origin = (await headers()).get("origin") || "https://prop-tech-radar.vercel.app";
+    const origin = process.env.NEXT_PUBLIC_SITE_URL || "https://kavox.tech";
 
     // Generamos la sesión del portal de cliente
     const portalSession = await stripe.billingPortal.sessions.create({

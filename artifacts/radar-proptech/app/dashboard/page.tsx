@@ -258,7 +258,13 @@ export default function DashboardPage() {
                   <tr key={lead.id_anuncio} className="hover:bg-slate-50/50 transition-colors group">
                     <td className="px-4 py-2">
                       {lead.foto ? (
-                        <img src={lead.foto} alt="Inmueble" className="w-10 h-10 rounded-md object-cover border border-gray-200" />
+                        <img 
+                          // Pasamos la URL por el proxy, forzamos dimensiones para ahorrar peso y evitamos enviar el 'referer'
+                          src={`https://wsrv.nl/?url=${encodeURIComponent(lead.foto)}&w=100&h=100&fit=cover`} 
+                          alt="Inmueble" 
+                          className="w-10 h-10 rounded-md object-cover border border-gray-200"
+                          referrerPolicy="no-referrer" 
+                        />
                       ) : (
                         <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center border border-gray-200 text-lg">🏠</div>
                       )}

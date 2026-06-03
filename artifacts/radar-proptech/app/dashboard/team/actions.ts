@@ -65,7 +65,7 @@ export async function addAgent(formData: FormData) {
   const resendKey = process.env.RESEND_API_KEY;
   if (resendKey) {
     try {
-      const origin = (await headers()).get("origin") || "https://kavox.tech";
+      const origin = process.env.NEXT_PUBLIC_SITE_URL || "https://kavox.tech";
       const loginUrl = `${origin}/login?email=${encodeURIComponent(email)}`;
       const agencyName = agencyData?.nombre_empresa || "tu agencia";
 

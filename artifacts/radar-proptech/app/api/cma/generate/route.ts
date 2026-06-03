@@ -102,25 +102,35 @@ export async function POST(request: Request) {
       if (lead.foto) {
         try {
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 5000); 
-          const imageResponse = await fetch(lead.foto, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: controller.signal });
+          const timeoutId = setTimeout(() => controller.abort(), 8000); // Subimos timeout a 8s para dar margen al proxy
+
+          // MAGIA: El proxy descarga el WEBP de Idealista y nos lo devuelve convertido a JPG puro.
+          const proxyImageUrl = `https://wsrv.nl/?url=${encodeURIComponent(lead.foto)}&output=jpg`;
+
+          const imageResponse = await fetch(proxyImageUrl, { 
+            signal: controller.signal 
+          });
           clearTimeout(timeoutId);
 
           if (imageResponse.ok) {
             const imageBuffer = await imageResponse.arrayBuffer();
-            const imageToEmbed = lead.foto.toLowerCase().includes('.png') 
-              ? await pdfDoc.embedPng(imageBuffer) 
-              : await pdfDoc.embedJpg(imageBuffer);
+
+            // Como forzamos &output=jpg, SIEMPRE lo incrustamos como JPG sin importar la extensión original
+            const imageToEmbed = await pdfDoc.embedJpg(imageBuffer);
 
             page.drawImage(imageToEmbed, { x: 40, y: height - 400, width: 250, height: 190 });
             imageDrawn = true;
+          } else {
+             console.warn("El proxy de imagen devolvió status:", imageResponse.status);
           }
-        } catch (e) { /* Silenciamos error de imagen para usar el fallback */ }
+        } catch (e) { 
+           console.error("Fallo al procesar imagen en el PDF:", e);
+        }
       }
 
       if (!imageDrawn) {
         page.drawRectangle({ x: 40, y: height - 400, width: 250, height: 190, color: borderGray });
-        page.drawText("IMAGEN PROTEGIDA", { x: 95, y: height - 300, size: 12, font: fontBold, color: textMuted });
+        page.drawText("IMAGEN PROTEGIDA U OCULTA", { x: 80, y: height - 300, size: 11, font: fontBold, color: textMuted });
       }
 
       // --- GRID DE DATOS ---

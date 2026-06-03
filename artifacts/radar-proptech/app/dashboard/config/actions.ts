@@ -65,7 +65,7 @@ export async function completeOnboarding(formData: FormData) {
   }
 
   // SI ES UN CLIENTE NORMAL (ADMIN), VA A STRIPE
-  const origin = (await headers()).get("origin") || "https://prop-tech-radar.vercel.app";
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || "https://kavox.tech";
   let checkoutUrl = ""; 
 
   try {
