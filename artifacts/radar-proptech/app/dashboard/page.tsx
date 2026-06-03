@@ -29,6 +29,7 @@ type LeadData = {
   planta: string | null;
   direccion: string | null;
   pdf_cma_url: string | null;
+  origen_rastreo: string | null; // <--- NUEVO CAMPO AÑADIDO
   created_at: string;
 };
 
@@ -252,6 +253,7 @@ export default function DashboardPage() {
               <tr>
                 <th className="px-4 py-3 font-semibold text-gray-500 w-12">Foto</th>
                 <th className="px-4 py-3 font-semibold text-gray-500 max-w-[200px]">Inmueble</th>
+                <th className="px-4 py-3 font-semibold text-gray-500">Radar</th>
                 <th className="px-4 py-3 font-semibold text-gray-500 cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => handleSort('precio')}>
                   Precio <SortIcon columnKey="precio" />
                 </th>
@@ -266,7 +268,7 @@ export default function DashboardPage() {
             <tbody className="divide-y divide-gray-100">
               {filteredAndSortedLeads.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-gray-400">No hay leads en esta vista.</td>
+                  <td colSpan={8} className="px-4 py-12 text-center text-gray-400">No hay leads en esta vista.</td>
                 </tr>
               ) : (
                 filteredAndSortedLeads.map((lead) => (
@@ -294,6 +296,12 @@ export default function DashboardPage() {
                           {lead.planta && <span>Plta. {lead.planta}</span>}
                         </div>
                       </div>
+                    </td>
+                    {/* NUEVA COLUMNA DE RADAR */}
+                    <td className="px-4 py-2">
+                      <span className="inline-flex items-center px-2 py-1 rounded-md text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200 truncate max-w-[120px]" title={lead.origen_rastreo || "General"}>
+                        {lead.origen_rastreo || "General"}
+                      </span>
                     </td>
                     <td className="px-4 py-2 font-bold text-kavox-accent">{currencyFormatter.format(lead.precio || 0)}</td>
                     <td className="px-4 py-2 text-xs text-gray-500">

@@ -119,6 +119,7 @@ export async function POST(request: Request) {
             planta: planta,
             direccion: direccion,
             descripcion: descripcion
+            origen_rastreo: rastreador.nombre_rastreo
           });
 
           if (insertError) continue;
