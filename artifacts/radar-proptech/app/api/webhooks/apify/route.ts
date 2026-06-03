@@ -1,3 +1,4 @@
+// artifacts/radar-proptech/app/api/webhooks/apify/route.ts
 import { NextResponse } from 'next/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 
@@ -112,13 +113,12 @@ export async function POST(request: Request) {
             precio: precio,
             foto: foto,
             telefono: telefono,
-            // Nuevos datos inyectados
             m2: m2,
             habitaciones: habitaciones,
             banos: banos,
             planta: planta,
             direccion: direccion,
-            descripcion: descripcion
+            descripcion: descripcion, // <--- AQUÍ ESTABA EL ERROR (Faltaba esta coma)
             origen_rastreo: rastreador.nombre_rastreo
           });
 
