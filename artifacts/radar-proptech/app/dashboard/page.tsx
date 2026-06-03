@@ -4,8 +4,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { Smartphone, X, ExternalLink, Loader2, Download, TrendingUp, Wallet, Crosshair, Calendar, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
-import { QRCodeSVG } from "qrcode.react";
+import { Smartphone, X, ExternalLink, Loader2, TrendingUp, Wallet, Crosshair, Calendar, ArrowUpDown, ArrowUp, ArrowDown, CheckCircle2, Copy } from "lucide-react";
 import { updateLeadStatus } from "./actions";
 
 type TrackerData = {
@@ -40,7 +39,11 @@ export default function DashboardPage() {
   const [trackers, setTrackers] = useState<TrackerData[]>([]);
   const [leads, setLeads] = useState<LeadData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Modal Telegram
   const [selectedTrackerId, setSelectedTrackerId] = useState<string | null>(null);
+  const [copiedCommand, setCopiedCommand] = useState(false);
+
   const [processingPdf, setProcessingPdf] = useState<string | null>(null);
 
   // Vistas CRM
@@ -111,6 +114,12 @@ export default function DashboardPage() {
     }
   };
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedCommand(true);
+    setTimeout(() => setCopiedCommand(false), 2000);
+  };
+
   // --- LÓGICA DE ORDENACIÓN Y FILTRADO ---
   const handleSort = (key: 'created_at' | 'precio') => {
     setSortConfig(prev => ({
@@ -178,20 +187,26 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col h-full p-6 gap-6 max-w-[1400px] mx-auto w-full animate-in fade-in duration-500">
 
-      {/* 1. HEADER */}
+      {/* 1. HEADER (Botones Superiores) */}
       <div className="flex justify-between items-end shrink-0">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">CRM de Captación</h1>
           <p className="text-gray-500 text-sm mt-1">Intercepción en tiempo real y gestión del embudo.</p>
         </div>
         <div className="flex items-center gap-3">
-          {trackers.map(t => !t.telegram_chat_id && (
-             <button key={t.id} onClick={() => setSelectedTrackerId(t.id)} className="bg-amber-100 hover:bg-amber-200 text-amber-800 border border-amber-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5">
+          {trackers.map(t => 
+            !t.telegram_chat_id ? (
+             <button key={t.id} onClick={() => setSelectedTrackerId(t.id)} className="bg-amber-100 hover:bg-amber-200 text-amber-800 border border-amber-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm">
                <Smartphone className="w-3.5 h-3.5" /> Conectar {t.nombre_rastreo}
              </button>
-          ))}
+            ) : (
+              <div key={t.id} className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm">
+                <CheckCircle2 className="w-3.5 h-3.5" /> {t.nombre_rastreo}
+              </div>
+            )
+          )}
           {rol === 'admin' && (
-            <div className="text-xs font-bold uppercase text-kavox-accent bg-kavox-accent/10 border border-kavox-accent/20 px-3 py-1.5 rounded-full">ADMINISTRADOR</div>
+            <div className="text-xs font-bold uppercase text-kavox-accent bg-kavox-accent/10 border border-kavox-accent/20 px-3 py-1.5 rounded-full ml-2">ADMINISTRADOR</div>
           )}
         </div>
       </div>
@@ -259,7 +274,6 @@ export default function DashboardPage() {
                     <td className="px-4 py-2">
                       {lead.foto ? (
                         <img 
-                          // Pasamos la URL por el proxy, forzamos dimensiones para ahorrar peso y evitamos enviar el 'referer'
                           src={`https://wsrv.nl/?url=${encodeURIComponent(lead.foto)}&w=100&h=100&fit=cover`} 
                           alt="Inmueble" 
                           className="w-10 h-10 rounded-md object-cover border border-gray-200"
@@ -319,33 +333,47 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* MODAL TELEGRAM (Actualizado visualmente y absoluto) */}
+      {/* MODAL TELEGRAM OPTIMIZADO */}
       {selectedTrackerId && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md relative flex flex-col p-8 animate-in zoom-in-95 duration-200">
             <button onClick={() => setSelectedTrackerId(null)} className="absolute top-4 right-4 text-gray-400 hover:text-slate-800"><X className="w-5 h-5" /></button>
+
             <div className="text-center mb-6">
-              <h2 className="text-xl font-bold text-slate-900">Conecta tu Grupo</h2>
-              <p className="text-gray-500 mt-1 text-sm">Sigue estos pasos para recibir alertas en tu equipo.</p>
+              <div className="bg-kavox-accent/10 text-kavox-accent w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Smartphone className="w-6 h-6" />
+              </div>
+              <h2 className="text-xl font-bold text-slate-900">Activar Alertas Push</h2>
+              <p className="text-gray-500 mt-1 text-sm">Conecta este radar a un grupo de Telegram en 3 sencillos pasos.</p>
             </div>
-            <div className="space-y-4">
+
+            <div className="space-y-5">
               <div className="flex gap-3 items-start">
-                <span className="bg-kavox-accent text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5">1</span> 
-                <p className="text-sm font-medium text-slate-700">Abre Telegram, crea un <strong>Nuevo Grupo</strong> (Ej: "Radar Madrid") y añade a tus comerciales.</p>
+                <span className="bg-slate-800 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5">1</span> 
+                <p className="text-sm font-medium text-slate-700">Abre Telegram y crea un <strong>Nuevo Grupo</strong> exclusivo para esta zona (Ej: "Radar Madrid"). Añade a los comerciales que trabajarán estos leads.</p>
               </div>
               <div className="flex gap-3 items-start">
-                <span className="bg-kavox-accent text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5">2</span> 
-                <p className="text-sm font-medium text-slate-700">Añade a nuestro bot al grupo. Búscalo como: <strong className="text-kavox-accent select-all">@RadarPropTech_bot</strong></p>
+                <span className="bg-slate-800 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5">2</span> 
+                <p className="text-sm font-medium text-slate-700">Añade a nuestro robot a ese grupo. Búscalo como: <strong className="text-kavox-accent select-all">@KavoxAlertas_bot</strong> <br/><span className="text-xs text-gray-500">(Otórgale permisos de administrador si te lo pide).</span></p>
               </div>
               <div className="flex gap-3 items-start">
-                <span className="bg-kavox-accent text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5">3</span> 
-                <div className="text-sm font-medium text-slate-700">Copia y envía este comando exacto en el grupo:
-                  <div className="mt-2 bg-slate-100 border border-slate-200 p-2.5 rounded text-xs font-mono select-all text-slate-800">
-                    /start {selectedTrackerId}
+                <span className="bg-slate-800 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5">3</span> 
+                <div className="text-sm font-medium text-slate-700 w-full">Copia este comando y envíalo como un mensaje dentro de ese grupo:
+
+                  <div className="mt-2 bg-slate-50 border border-slate-200 p-1.5 pl-3 rounded-lg flex items-center justify-between">
+                    <code className="text-xs font-mono text-slate-800 truncate">/start {selectedTrackerId}</code>
+                    <button 
+                      onClick={() => copyToClipboard(`/start ${selectedTrackerId}`)}
+                      className="bg-white border border-gray-200 p-2 rounded-md hover:bg-gray-50 transition-colors"
+                      title="Copiar Comando"
+                    >
+                      {copiedCommand ? <CheckCircle2 className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-slate-500" />}
+                    </button>
                   </div>
                 </div>
               </div>
-              <button onClick={() => window.location.reload()} className="w-full mt-6 bg-kavox-body text-white py-3 rounded-lg font-semibold hover:bg-black transition-colors">
+
+              <button onClick={() => window.location.reload()} className="w-full mt-4 bg-kavox-body text-white py-3 rounded-lg font-semibold hover:bg-black transition-colors shadow-lg">
                 Ya he enviado el comando
               </button>
             </div>

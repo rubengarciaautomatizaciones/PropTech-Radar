@@ -21,13 +21,30 @@ export async function POST(request: Request) {
 
     const chatId = body.message.chat.id;
     const text = body.message.text as string;
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
 
-    // Telegram envía "/start ID_DEL_RASTREADOR" (nuestra nueva arquitectura)
+    // Telegram envía "/start ID_DEL_RASTREADOR"
     if (text.startsWith('/start ')) {
+
+      // 🛡️ ESCUDO ANTI-CHATS PRIVADOS
+      // En Telegram, los IDs de chats privados son positivos. Los grupos son negativos.
+      if (chatId > 0) {
+        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: "❌ *Error de configuración*\n\nEste comando solo funciona si lo envías dentro de un **Grupo** de Telegram, no en este chat privado.\n\nPor favor, crea un grupo, añade a este bot al grupo, y envía el comando allí.",
+            parse_mode: 'Markdown'
+          })
+        });
+        return NextResponse.json({ success: true, status: "rejected_private_chat" });
+      }
+
       const trackerId = text.split(' ')[1];
       const supabaseAdmin = getSupabaseAdmin();
 
-      // Actualizamos la tabla de CONFIGURACION_RASTREO con el chat de Telegram
+      // Actualizamos la tabla de CONFIGURACION_RASTREO con el chat de Telegram (solo grupos)
       const { error } = await supabaseAdmin
         .from('configuracion_rastreo')
         .update({ telegram_chat_id: chatId.toString() })
@@ -38,13 +55,13 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: false }); 
       }
 
-      const botToken = process.env.TELEGRAM_BOT_TOKEN;
       await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: chatId,
-          text: "✅ ¡Rastreador vinculado con éxito!\n\nEste chat empezará a recibir alertas de propiedades inmediatamente."
+          text: "✅ *¡Radar KAVOX vinculado con éxito!*\n\nEste canal táctico empezará a recibir alertas de propiedades en tiempo real.",
+          parse_mode: 'Markdown'
         })
       });
 
