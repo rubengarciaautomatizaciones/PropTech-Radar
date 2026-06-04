@@ -1,8 +1,11 @@
+# .replit - Configuración optimizada para desarrollo en Monorepo
+
 modules = ["nodejs-24"]
 
 entrypoint = "artifacts/radar-proptech/package.json"
 
-run = "pkill -f 'next dev' || true; cd artifacts/radar-proptech && pnpm install && rm -rf .next && pnpm exec next dev -p 3000"
+# AÑADIMOS -H 0.0.0.0 PARA QUE REPLIT PUEDA CONECTARSE AL SERVIDOR
+run = "pkill -f 'next dev' || true; cd artifacts/radar-proptech && pnpm install && rm -rf .next && pnpm exec next dev -H 0.0.0.0 -p 3000"
 
 [agent]
 stack = "PNPM_WORKSPACE"
@@ -11,4 +14,7 @@ expertMode = true
 [[ports]]
 localPort = 3000
 externalPort = 80
-exposeLocalhost = true
+
+[[ports]]
+localPort = 19946
+externalPort = 3000
