@@ -1,8 +1,9 @@
-// artifacts/radar-proptech/middleware.ts
+// artifacts/radar-proptech/proxy.ts
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
+// Cambiamos el nombre de la función exportada a 'proxy'
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   })
