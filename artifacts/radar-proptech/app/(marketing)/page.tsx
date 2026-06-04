@@ -3,7 +3,8 @@
 
 import { useState, useTransition } from "react";
 import { joinWaitlist } from "./actions/waitlist";
-import { Zap, FileText, Cpu, Database, ChevronRight, CheckCircle2, Linkedin, Smartphone } from "lucide-react";
+import { ChevronRight, CheckCircle2, Linkedin } from "lucide-react";
+import Link from "next/link";
 
 export default function PriestleyWaitlistLanding() {
   const [isPending, startTransition] = useTransition();
@@ -11,25 +12,15 @@ export default function PriestleyWaitlistLanding() {
   const [errorMsg, setErrorMsg] = useState("");
 
   const [formData, setFormData] = useState({
-    nombre: "",
-    agencia: "",
-    email: "",
-    telefono: "",
-    zona: "",
-    q_situacion: "",
-    q_objetivo: "",
-    q_obstaculo: "",
-    q_presupuesto: "",
-    q_abierta: ""
+    nombre: "", agencia: "", email: "", telefono: "", zona: "",
+    q_situacion: "", q_objetivo: "", q_obstaculo: "", q_presupuesto: "", q_abierta: ""
   });
 
-  const handleUpdate = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  const handleUpdate = (field: string, value: string) => setFormData(prev => ({ ...prev, [field]: value }));
 
   const nextStep = () => {
     if (step === 1 && (!formData.nombre || !formData.agencia || !formData.email || !formData.telefono || !formData.zona)) {
-      setErrorMsg("Por favor, completa todos los datos de contacto para continuar.");
+      setErrorMsg("Requerimos todos los datos de contacto para evaluar la solicitud.");
       return;
     }
     setErrorMsg("");
@@ -39,12 +30,8 @@ export default function PriestleyWaitlistLanding() {
   const submitForm = () => {
     startTransition(async () => {
       const result = await joinWaitlist(formData);
-      if (result.error) {
-        setErrorMsg(result.error);
-        setStep(1); 
-      } else {
-        setStep(7); 
-      }
+      if (result.error) { setErrorMsg(result.error); setStep(1); } 
+      else setStep(7);
     });
   };
 
@@ -52,193 +39,113 @@ export default function PriestleyWaitlistLanding() {
     <div className="w-full">
       {/* SECCIÓN 1: HOOK & VALUE PROP (LA LANDING) */}
       {step === 0 && (
-        <div className="animate-in fade-in duration-500">
-          <section className="pt-20 pb-16 px-6 max-w-5xl mx-auto text-center md:text-left flex flex-col items-center md:items-start">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-kavox-accent/10 text-kavox-accent text-sm font-semibold mb-6">
+        <div className="animate-in fade-in duration-700">
+          <section className="pt-24 pb-20 px-6 max-w-4xl mx-auto text-center flex flex-col items-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-kavox-surface border border-gray-200 text-kavox-body text-xs font-bold uppercase tracking-widest mb-8">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-kavox-accent opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-kavox-accent"></span>
               </span>
-              Abriendo Beta Privada (Solo 50 Plazas)
+              Fase Beta Privada (Acceso Restringido)
             </div>
 
-            <h1 className="font-heading font-medium text-4xl md:text-6xl text-kavox-body leading-[1.1] tracking-tight max-w-4xl">
-              El radar sub-segundo que va a jubilar a tu CRM actual.
+            <h1 className="font-heading font-bold text-5xl md:text-7xl text-kavox-body leading-[1.1] tracking-tight mb-8">
+              Mientras actualizas Idealista a mano, otro agente ya está llamando a tu exclusiva.
             </h1>
-            <p className="mt-6 text-lg md:text-xl text-kavox-muted max-w-3xl leading-relaxed">
-              KAVOX es la infraestructura táctica que detecta inmuebles de particulares en la Golden Hour, y te envía la alerta directa al móvil. Conviértete en la primera llamada de tu código postal.
-            </p>
+
+            <div className="text-lg md:text-xl text-kavox-muted max-w-2xl leading-relaxed space-y-6">
+              <p>
+                Sabes perfectamente lo que pasa cuando un particular sube un piso. Tarda minutos en recibir 20 llamadas. Inmovilla te avisa horas tarde. Betterplace no llega a tiempo. El propietario se agobia y se lo da a la competencia.
+              </p>
+              <p>
+                Pierdes 10.000€ de honorarios por llegar 15 minutos tarde.
+              </p>
+              <p className="font-medium text-kavox-body">
+                Hemos construido una infraestructura que burla los antibots y te mete el anuncio en tu Telegram en milisegundos. Abres Telegram, tienes el teléfono, llamas el primero.
+              </p>
+            </div>
 
             <button 
               onClick={() => setStep(1)}
-              className="mt-10 bg-kavox-accent hover:bg-teal-800 text-white font-medium text-lg px-8 py-4 rounded-md transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
+              className="mt-12 bg-kavox-body hover:bg-black text-white font-heading font-semibold tracking-wide text-lg px-10 py-5 rounded-md transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 flex items-center gap-3"
             >
-              Solicitar acceso a la Beta <ChevronRight className="w-5 h-5" />
+              Solicitar Admisión a la Beta <ChevronRight className="w-5 h-5" />
             </button>
-            <p className="mt-3 text-sm text-kavox-muted">Bloquea tu precio de 99€/mes de por vida. Sin tarjeta hoy.</p>
-          </section>
+            <p className="mt-4 text-xs font-medium uppercase tracking-widest text-kavox-muted">Bloquea tu precio fundador (99€/mes). Sin tarjeta.</p>
 
-          {/* CREDIBILIDAD: EL ÁNGULO DEL "OUTSIDER TÉCNICO" */}
-          <section className="py-16 bg-white border-y border-gray-100">
-            <div className="max-w-5xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="font-heading text-2xl md:text-3xl text-kavox-body mb-6">
-                  Ingeniería de datos por encima de la tradición inmobiliaria.
-                </h2>
-                <p className="text-kavox-muted leading-relaxed mb-4">
-                  El sector inmobiliario no tiene un problema de escasez de pisos, tiene un problema de <strong>tecnología obsoleta</strong>.
-                </p>
-                <p className="text-kavox-muted leading-relaxed">
-                  Tras más de 6 años emprendiendo y 2 años diseñando sistemas de Inteligencia Artificial para empresas, hemos construido KAVOX. No somos una agencia intentando hacer software; somos ingenieros tácticos creando la ventaja tecnológica definitiva para que domines tu zona.
-                </p>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-kavox-surface p-6 rounded-xl border border-gray-100 text-center">
-                  <Cpu className="w-8 h-8 text-kavox-accent mx-auto mb-3" />
-                  <div className="font-heading font-bold text-2xl text-kavox-body mb-1">Sub-Seg.</div>
-                  <div className="text-xs text-kavox-muted uppercase tracking-wider">Latencia Media</div>
-                </div>
-                <div className="bg-kavox-surface p-6 rounded-xl border border-gray-100 text-center">
-                  <Database className="w-8 h-8 text-kavox-accent mx-auto mb-3" />
-                  <div className="font-heading font-bold text-2xl text-kavox-body mb-1">100%</div>
-                  <div className="text-xs text-kavox-muted uppercase tracking-wider">Anti-Datadome</div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* TUS 3 VENTAJAS INJUSTAS */}
-          <section className="py-20 bg-kavox-surface">
-            <div className="max-w-5xl mx-auto px-6">
-              <h2 className="font-heading font-medium text-2xl md:text-3xl text-kavox-body mb-12 text-center md:text-left">
-                Tus 3 ventajas injustas.
-              </h2>
-              <div className="grid md:grid-cols-3 gap-8">
-                <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-                  <Zap className="w-6 h-6 text-kavox-accent mb-6" />
-                  <h3 className="font-heading font-medium text-xl text-kavox-body mb-4">Velocidad Táctica</h3>
-                  <p className="text-kavox-muted leading-relaxed">Tu competencia actualiza la pestaña a mano. KAVOX extrae el dato en milisegundos evadiendo bloqueos antibot en tiempo real.</p>
-                </div>
-                <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-                  <FileText className="w-6 h-6 text-kavox-accent mb-6" />
-                  <h3 className="font-heading font-medium text-xl text-kavox-body mb-4">One-Click CMA</h3>
-                  <p className="text-kavox-muted leading-relaxed">Genera un estudio de mercado durante el tono de llamada. Pasa de puerta fría a auditoría incontestable en 3 segundos.</p>
-                </div>
-                <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-                  <Smartphone className="w-6 h-6 text-kavox-accent mb-6" />
-                  <h3 className="font-heading font-medium text-xl text-kavox-body mb-4">Alerta Directa al Móvil</h3>
-                  <p className="text-kavox-muted leading-relaxed">Cuando un particular sube un inmueble, entra a tu CRM y el móvil de tus agentes vibra al segundo. Sin iniciar sesión, sin demoras.</p>
-                </div>
-              </div>
+            {/* Huevo de pascua para ti */}
+            <div className="mt-20">
+               <Link href="/pro" className="text-[10px] text-gray-300 hover:text-gray-400">Ver versión PLG (/pro)</Link>
             </div>
           </section>
         </div>
       )}
 
-      {/* SECCIONES 1 AL 6: EL FUNNEL PRIESTLEY */}
+      {/* EL FUNNEL PRIESTLEY ELITISTA */}
       {step > 0 && step < 7 && (
-        <div className="min-h-[80vh] flex items-center justify-center px-4 bg-kavox-surface animate-in fade-in zoom-in-95 duration-300 py-10">
-          <div className="bg-white p-8 md:p-12 rounded-2xl shadow-2xl border border-gray-100 w-full max-w-2xl relative overflow-hidden">
-            {/* Barra de progreso */}
-            <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-100">
-              <div 
-                className="h-full bg-kavox-accent transition-all duration-500 ease-out"
-                style={{ width: `${(step / 6) * 100}%` }}
-              ></div>
+        <div className="min-h-[75vh] flex items-center justify-center px-4 py-12 animate-in fade-in zoom-in-95 duration-300">
+          <div className="bg-white p-10 md:p-14 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 w-full max-w-2xl relative overflow-hidden">
+
+            <div className="absolute top-0 left-0 w-full h-1 bg-kavox-surface">
+              <div className="h-full bg-kavox-accent transition-all duration-500 ease-out" style={{ width: `${(step / 6) * 100}%` }}></div>
             </div>
 
-            <div className="mb-8 mt-2 text-sm font-semibold text-kavox-accent uppercase tracking-wider">
-              Paso {step} de 6
+            <div className="mb-10 mt-2 text-xs font-bold text-kavox-accent uppercase tracking-widest">
+              Evaluación Técnica • Paso {step} de 6
             </div>
 
             {errorMsg && (
-              <div className="mb-6 p-4 bg-red-50 text-kavox-alert rounded-lg text-sm font-medium">
+              <div className="mb-8 p-4 bg-red-50/50 border border-red-100 text-kavox-alert rounded-md text-sm font-medium">
                 {errorMsg}
               </div>
             )}
 
-            {/* PASO 1 ACTUALIZADO: DATOS DE CONTACTO COMPLETOS */}
+            {/* PASO 1 */}
             {step === 1 && (
-              <div className="space-y-6">
-                <h2 className="font-heading text-2xl text-kavox-body">¿A dónde enviamos tu acceso a la Beta?</h2>
-                <p className="text-kavox-muted text-sm">El acceso incluye tu precio fundador bloqueado y un vídeo demo confidencial enseñando el sistema.</p>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-kavox-body mb-1">Nombre Completo</label>
-                    <input 
-                      type="text" 
-                      value={formData.nombre}
-                      onChange={(e) => handleUpdate("nombre", e.target.value)}
-                      className="w-full border border-gray-300 rounded-md p-3 outline-none focus:ring-2 focus:ring-kavox-accent"
-                      placeholder="Tu nombre"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-kavox-body mb-1">Inmobiliaria</label>
-                    <input 
-                      type="text" 
-                      value={formData.agencia}
-                      onChange={(e) => handleUpdate("agencia", e.target.value)}
-                      className="w-full border border-gray-300 rounded-md p-3 outline-none focus:ring-2 focus:ring-kavox-accent"
-                      placeholder="Nombre de tu agencia"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-kavox-body mb-1">Email Profesional</label>
-                    <input 
-                      type="email" 
-                      value={formData.email}
-                      onChange={(e) => handleUpdate("email", e.target.value)}
-                      className="w-full border border-gray-300 rounded-md p-3 outline-none focus:ring-2 focus:ring-kavox-accent"
-                      placeholder="gerencia@agencia.com"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-kavox-body mb-1">Teléfono Móvil</label>
-                    <input 
-                      type="tel" 
-                      value={formData.telefono}
-                      onChange={(e) => handleUpdate("telefono", e.target.value)}
-                      className="w-full border border-gray-300 rounded-md p-3 outline-none focus:ring-2 focus:ring-kavox-accent"
-                      placeholder="+34 600 000 000"
-                    />
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-kavox-body mb-1">¿Qué código postal/zona quieres monopolizar?</label>
-                    <input 
-                      type="text" 
-                      value={formData.zona}
-                      onChange={(e) => handleUpdate("zona", e.target.value)}
-                      className="w-full border border-gray-300 rounded-md p-3 outline-none focus:ring-2 focus:ring-kavox-accent"
-                      placeholder="Ej. Madrid Centro, Sarrià, 46001..."
-                    />
-                  </div>
+              <div className="space-y-8">
+                <div>
+                  <h2 className="font-heading font-bold text-3xl text-kavox-body mb-2">Datos de Identificación</h2>
+                  <p className="text-kavox-muted text-sm leading-relaxed">¿A quién le entregaremos la ventaja táctica de la zona? Si eres admitido, te enviaremos una demostración técnica confidencial a este correo.</p>
                 </div>
 
-                <button onClick={nextStep} className="w-full bg-kavox-body text-white p-4 rounded-md font-medium hover:bg-black transition-colors mt-2">
-                  Siguiente Pregunta
-                </button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="col-span-1 md:col-span-2">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-kavox-body mb-2">¿Qué zona quieres monopolizar?</label>
+                    <input type="text" value={formData.zona} onChange={(e) => handleUpdate("zona", e.target.value)} className="w-full border border-gray-200 bg-kavox-surface rounded-md p-4 outline-none focus:border-kavox-accent focus:ring-1 focus:ring-kavox-accent transition-all" placeholder="Ej. Código Postal 46001, Madrid Barrio Salamanca..." />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-kavox-body mb-2">Nombre del Solicitante</label>
+                    <input type="text" value={formData.nombre} onChange={(e) => handleUpdate("nombre", e.target.value)} className="w-full border border-gray-200 bg-kavox-surface rounded-md p-4 outline-none focus:border-kavox-accent focus:ring-1 focus:ring-kavox-accent transition-all" placeholder="Nombre completo" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-kavox-body mb-2">Entidad / Agencia</label>
+                    <input type="text" value={formData.agencia} onChange={(e) => handleUpdate("agencia", e.target.value)} className="w-full border border-gray-200 bg-kavox-surface rounded-md p-4 outline-none focus:border-kavox-accent focus:ring-1 focus:ring-kavox-accent transition-all" placeholder="Nombre de la inmobiliaria" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-kavox-body mb-2">Email Profesional</label>
+                    <input type="email" value={formData.email} onChange={(e) => handleUpdate("email", e.target.value)} className="w-full border border-gray-200 bg-kavox-surface rounded-md p-4 outline-none focus:border-kavox-accent focus:ring-1 focus:ring-kavox-accent transition-all" placeholder="tu@empresa.com" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-kavox-body mb-2">Teléfono de Contacto</label>
+                    <input type="tel" value={formData.telefono} onChange={(e) => handleUpdate("telefono", e.target.value)} className="w-full border border-gray-200 bg-kavox-surface rounded-md p-4 outline-none focus:border-kavox-accent focus:ring-1 focus:ring-kavox-accent transition-all" placeholder="+34 600 000 000" />
+                  </div>
+                </div>
+                <button onClick={nextStep} className="w-full bg-kavox-accent text-white p-4 rounded-md font-bold uppercase tracking-wider hover:bg-teal-800 transition-colors mt-4">Iniciar Evaluación</button>
               </div>
             )}
 
-            {/* PASO 2: SITUACIÓN ACTUAL */}
+            {/* PASO 2 */}
             {step === 2 && (
-              <div className="space-y-6">
-                <h2 className="font-heading text-2xl text-kavox-body">Actualmente, ¿cómo captas particulares?</h2>
+              <div className="space-y-8">
+                <h2 className="font-heading font-bold text-3xl text-kavox-body">Auditoría Operativa</h2>
+                <p className="text-kavox-muted text-sm">Sé honesto. ¿Cómo estás captando a los particulares en este momento?</p>
                 <div className="space-y-3">
                   {[
-                    "A: Rastreo manual (refrescando portales constantemente).",
-                    "B: Uso un CRM (Inmovilla, Betterplace) pero llega tarde.",
-                    "C: Solo referidos y acciones de calle (puerta fría)."
+                    "A: Fuerza bruta manual. Refrescamos los portales constantemente en la oficina.",
+                    "B: Dependo de un CRM tradicional (Inmovilla/Betterplace) pero noto el retraso.",
+                    "C: Métodos analógicos. Principalmente referidos, buzoneo o puerta fría."
                   ].map((option) => (
-                    <button 
-                      key={option}
-                      onClick={() => { handleUpdate("q_situacion", option); nextStep(); }}
-                      className="w-full text-left p-4 border border-gray-200 rounded-lg hover:border-kavox-accent hover:bg-kavox-accent/5 transition-colors text-kavox-muted"
-                    >
+                    <button key={option} onClick={() => { handleUpdate("q_situacion", option); nextStep(); }} className="w-full text-left p-5 border border-gray-200 rounded-lg hover:border-kavox-accent hover:bg-kavox-surface transition-colors text-kavox-body font-medium leading-relaxed">
                       {option}
                     </button>
                   ))}
@@ -246,21 +153,18 @@ export default function PriestleyWaitlistLanding() {
               </div>
             )}
 
-            {/* PASO 3: OBJETIVO */}
+            {/* PASO 3 */}
             {step === 3 && (
-              <div className="space-y-6">
-                <h2 className="font-heading text-2xl text-kavox-body">¿Cuál es tu objetivo principal al incorporar KAVOX?</h2>
+              <div className="space-y-8">
+                <h2 className="font-heading font-bold text-3xl text-kavox-body">Objetivo Táctico</h2>
+                <p className="text-kavox-muted text-sm">¿Para qué quieres implementar KAVOX exactamente?</p>
                 <div className="space-y-3">
                   {[
-                    "A: Robar el 'First-to-Call' (ser siempre el primero en llamar).",
-                    "B: Recibir la alerta en el móvil antes de que mi equipo encienda el ordenador.",
-                    "C: Automatizar el flujo de trabajo de todo mi equipo comercial."
+                    "A: Ventaja competitiva pura. Quiero robar el 'First-to-Call' de mi zona.",
+                    "B: Eficiencia. Quiero que mis agentes reciban la alerta en el móvil antes de encender el PC.",
+                    "C: Volumen. Necesito monopolizar los leads para alimentar a un equipo comercial grande."
                   ].map((option) => (
-                    <button 
-                      key={option}
-                      onClick={() => { handleUpdate("q_objetivo", option); nextStep(); }}
-                      className="w-full text-left p-4 border border-gray-200 rounded-lg hover:border-kavox-accent hover:bg-kavox-accent/5 transition-colors text-kavox-muted"
-                    >
+                    <button key={option} onClick={() => { handleUpdate("q_objetivo", option); nextStep(); }} className="w-full text-left p-5 border border-gray-200 rounded-lg hover:border-kavox-accent hover:bg-kavox-surface transition-colors text-kavox-body font-medium leading-relaxed">
                       {option}
                     </button>
                   ))}
@@ -268,21 +172,18 @@ export default function PriestleyWaitlistLanding() {
               </div>
             )}
 
-            {/* PASO 4: OBSTÁCULOS */}
+            {/* PASO 4 */}
             {step === 4 && (
-              <div className="space-y-6">
-                <h2 className="font-heading text-2xl text-kavox-body">¿Qué es lo que más te frustra de las herramientas actuales?</h2>
+              <div className="space-y-8">
+                <h2 className="font-heading font-bold text-3xl text-kavox-body">El Cuello de Botella</h2>
+                <p className="text-kavox-muted text-sm">¿Qué es lo que te hace perder dinero o tiempo a día de hoy?</p>
                 <div className="space-y-3">
                   {[
-                    "A: Me bloquean la IP o las alertas llegan con horas de retraso.",
-                    "B: Son muy caras para el poco valor directo que me aportan.",
-                    "C: Son complejas; mis agentes no las usan y acaban quemados."
+                    "A: Los escudos antibot (Datadome). Me bloquean la IP o las alertas me llegan horas tarde.",
+                    "B: El ROI nulo. Pago herramientas carísimas que no me consiguen exclusivas directas.",
+                    "C: La fricción del software. Mis comerciales no usan el CRM porque es lento y complejo."
                   ].map((option) => (
-                    <button 
-                      key={option}
-                      onClick={() => { handleUpdate("q_obstaculo", option); nextStep(); }}
-                      className="w-full text-left p-4 border border-gray-200 rounded-lg hover:border-kavox-accent hover:bg-kavox-accent/5 transition-colors text-kavox-muted"
-                    >
+                    <button key={option} onClick={() => { handleUpdate("q_obstaculo", option); nextStep(); }} className="w-full text-left p-5 border border-gray-200 rounded-lg hover:border-kavox-accent hover:bg-kavox-surface transition-colors text-kavox-body font-medium leading-relaxed">
                       {option}
                     </button>
                   ))}
@@ -290,22 +191,22 @@ export default function PriestleyWaitlistLanding() {
               </div>
             )}
 
-            {/* PASO 5: PRESUPUESTO / COMPROMISO */}
+            {/* PASO 5 */}
             {step === 5 && (
-              <div className="space-y-6">
-                <h2 className="font-heading text-2xl text-kavox-body">El filtro de compromiso</h2>
-                <p className="text-kavox-muted text-sm">El Radar KAVOX tiene un precio oficial de 199€/mes. <strong>Para las 50 agencias de la Beta, el precio queda bloqueado a 99€/mes de por vida.</strong></p>
-                <div className="space-y-3 mt-4">
+              <div className="space-y-8">
+                <h2 className="font-heading font-bold text-3xl text-kavox-body">El Filtro de Compromiso</h2>
+                <p className="text-kavox-muted text-sm leading-relaxed">
+                  KAVOX es una infraestructura de alto rendimiento que cuesta oficialmente 199€/mes por radar.
+                  <br/><br/>
+                  <strong>Para los 50 Beta Testers fundadores, el precio queda bloqueado en 99€/mes de por vida.</strong> Un solo piso captado paga el software durante 10 años.
+                </p>
+                <div className="space-y-3 mt-6">
                   {[
-                    "A: Sí, estoy dispuesto a invertir 99€/m si domino mi zona.",
-                    "B: Quizás, primero necesito ver el vídeo demostrativo.",
-                    "C: No, 99€/mes se sale de mi presupuesto operativo actual."
+                    "A: Comprendido. Si la tecnología cumple lo que promete, invertir 99€/mes es irrelevante.",
+                    "B: Me interesa, pero necesito ver la demostración técnica en vídeo antes de decidir.",
+                    "C: Sinceramente, 99€/mes está fuera de mis márgenes operativos actuales."
                   ].map((option) => (
-                    <button 
-                      key={option}
-                      onClick={() => { handleUpdate("q_presupuesto", option); nextStep(); }}
-                      className="w-full text-left p-4 border border-gray-200 rounded-lg hover:border-kavox-accent hover:bg-kavox-accent/5 transition-colors text-kavox-muted"
-                    >
+                    <button key={option} onClick={() => { handleUpdate("q_presupuesto", option); nextStep(); }} className="w-full text-left p-5 border border-gray-200 rounded-lg hover:border-kavox-accent hover:bg-kavox-surface transition-colors text-kavox-body font-medium leading-relaxed">
                       {option}
                     </button>
                   ))}
@@ -313,30 +214,25 @@ export default function PriestleyWaitlistLanding() {
               </div>
             )}
 
-            {/* PASO 6: FINAL (ABIERTA) */}
+            {/* PASO 6 */}
             {step === 6 && (
-              <div className="space-y-6">
-                <h2 className="font-heading text-2xl text-kavox-body">Último paso. ¿Hay algo más que debamos saber?</h2>
-                <p className="text-kavox-muted text-sm">Seleccionamos a mano a las 50 agencias. Cuéntanos por qué deberías tener exclusividad en tu zona.</p>
+              <div className="space-y-8">
+                <h2 className="font-heading font-bold text-3xl text-kavox-body">Defiende tu plaza</h2>
+                <p className="text-kavox-muted text-sm">Seleccionamos las solicitudes a mano para evitar saturar zonas. ¿Por qué deberíamos otorgarte acceso a KAVOX a ti y no a tu competencia directa?</p>
 
                 <textarea 
-                  value={formData.q_abierta}
-                  onChange={(e) => handleUpdate("q_abierta", e.target.value)}
-                  rows={4}
-                  className="w-full border border-gray-300 rounded-md p-3 outline-none focus:ring-2 focus:ring-kavox-accent resize-none"
-                  placeholder="Ej. Tengo un equipo de 5 comerciales muy agresivos y necesitamos volumen de leads..."
+                  value={formData.q_abierta} onChange={(e) => handleUpdate("q_abierta", e.target.value)}
+                  rows={5}
+                  className="w-full border border-gray-200 bg-kavox-surface rounded-md p-4 outline-none focus:border-kavox-accent focus:ring-1 focus:ring-kavox-accent transition-all resize-none text-kavox-body"
+                  placeholder="Se conciso y directo..."
                 ></textarea>
 
-                <div className="flex justify-between items-center gap-4 mt-2">
-                  <button onClick={() => setStep(5)} className="text-kavox-muted hover:text-kavox-body text-sm underline underline-offset-4">
+                <div className="flex justify-between items-center gap-4 pt-4">
+                  <button onClick={() => setStep(5)} className="text-kavox-muted hover:text-kavox-body text-xs font-bold uppercase tracking-widest">
                     Atrás
                   </button>
-                  <button 
-                    onClick={submitForm}
-                    disabled={isPending}
-                    className="flex-1 bg-kavox-accent text-white p-4 rounded-md font-medium hover:bg-teal-800 transition-colors disabled:opacity-70 flex justify-center items-center"
-                  >
-                    {isPending ? "Procesando solicitud..." : "Finalizar y Solicitar Acceso"}
+                  <button onClick={submitForm} disabled={isPending} className="bg-kavox-body text-white px-8 py-4 rounded-md font-bold uppercase tracking-widest hover:bg-black transition-colors disabled:opacity-70 flex justify-center items-center">
+                    {isPending ? "Procesando..." : "Enviar Solicitud"}
                   </button>
                 </div>
               </div>
@@ -345,34 +241,25 @@ export default function PriestleyWaitlistLanding() {
         </div>
       )}
 
-      {/* SECCIÓN 7: THANK YOU PAGE */}
+      {/* SECCIÓN 7: SUCCESS */}
       {step === 7 && (
-        <div className="min-h-[80vh] flex items-center justify-center px-4 bg-kavox-surface animate-in zoom-in-95 duration-500 py-10">
-          <div className="bg-white p-10 md:p-14 rounded-2xl shadow-xl border border-kavox-success/20 w-full max-w-xl text-center">
-            <CheckCircle2 className="w-20 h-20 text-kavox-success mx-auto mb-6" />
-            <h2 className="font-heading text-3xl text-kavox-body mb-4">Solicitud Recibida, {formData.nombre}</h2>
-            <p className="text-kavox-muted text-lg mb-8 leading-relaxed">
-              Enhorabuena, estás oficialmente en la lista de espera para dominar <strong>{formData.zona}</strong> con <strong>{formData.agencia}</strong>.<br/><br/>
-              Analizaremos tus respuestas y te enviaremos el vídeo confidencial de la demo a <strong>{formData.email}</strong> en las próximas horas.
+        <div className="min-h-[75vh] flex items-center justify-center px-4 py-12 animate-in zoom-in-95 duration-500">
+          <div className="bg-white p-12 rounded-2xl shadow-xl border border-gray-100 w-full max-w-xl text-center">
+            <CheckCircle2 className="w-16 h-16 text-kavox-success mx-auto mb-6" />
+            <h2 className="font-heading font-bold text-3xl text-kavox-body mb-4">Recepción Confirmada</h2>
+            <p className="text-kavox-muted text-base mb-10 leading-relaxed">
+              La solicitud para operar en <strong>{formData.zona}</strong> bajo el nombre de <strong>{formData.agencia}</strong> ha sido registrada en nuestros servidores.<br/><br/>
+              Nuestro equipo técnico analizará tu perfil. Si cumples los criterios operativos, recibirás el briefing en vídeo en <strong>{formData.email}</strong>.
             </p>
 
-            <div className="bg-kavox-surface p-6 rounded-xl border border-gray-100 mb-8">
-              <h3 className="font-semibold text-kavox-body mb-2">Siguiente Paso Recomendado:</h3>
-              <p className="text-sm text-kavox-muted mb-4">Conecta directamente con el fundador en LinkedIn para tener prioridad en el proceso de selección de la Beta.</p>
+            <div className="bg-kavox-surface p-8 rounded-xl border border-gray-100 mb-8 text-left">
+              <h3 className="font-bold text-kavox-body mb-2 uppercase tracking-wide text-sm">Paso Opcional (Fast-Track)</h3>
+              <p className="text-sm text-kavox-muted mb-6">Contacta directamente con el CEO por LinkedIn para solicitar prioridad en el proceso de auditoría.</p>
 
-              <a 
-                href="https://www.linkedin.com/in/ruben-garcia-ia/" 
-                target="_blank" 
-                rel="noreferrer"
-                className="inline-flex items-center justify-center gap-2 w-full bg-[#0A66C2] text-white p-3 rounded-md font-medium hover:bg-[#004182] transition-colors"
-              >
-                <Linkedin className="w-5 h-5" /> Conectar en LinkedIn
+              <a href="https://www.linkedin.com/in/ruben-garcia-ia/" target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-3 w-full bg-[#0A66C2] text-white p-4 rounded-md font-bold transition-colors hover:bg-[#004182]">
+                <Linkedin className="w-5 h-5" /> Iniciar conexión segura
               </a>
             </div>
-
-            <button onClick={() => setStep(0)} className="text-sm text-kavox-muted hover:text-kavox-body underline underline-offset-4">
-              Volver a la página principal
-            </button>
           </div>
         </div>
       )}

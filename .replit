@@ -1,22 +1,9 @@
-# .replit - Configuración optimizada para desarrollo en Monorepo
-
-# Especifica la versión de Node.js a utilizar
 modules = ["nodejs-24"]
 
-# --- INSTRUCCIONES PARA EL BOTÓN "RUN" ---
-# Esta es la parte más importante. Le dice a Replit dónde está tu app y cómo arrancarla.
-
-# 1. Punto de entrada: Le dice a Replit que el proyecto principal está en esta carpeta.
 entrypoint = "artifacts/radar-proptech/package.json"
 
-# 2. Comando de ejecución: Lo que sucede al pulsar "Run".
-#    - cd artifacts/radar-proptech: Entra en la carpeta de tu SaaS.
-#    - pnpm install: Asegura que las dependencias estén instaladas.
-#    - pnpm run dev: Inicia el servidor de desarrollo de Next.js.
-run = "cd artifacts/radar-proptech && pnpm install && pnpm run dev"
+run = "pkill -f 'next dev' || true; cd artifacts/radar-proptech && pnpm install && rm -rf .next && pnpm exec next dev -p 3000"
 
-# --- CONFIGURACIÓN DEL GESTOR DE PAQUETES ---
-# Le dice a Replit que estás usando pnpm en un workspace, lo cual es correcto.
 [agent]
 stack = "PNPM_WORKSPACE"
 expertMode = true
@@ -24,23 +11,4 @@ expertMode = true
 [[ports]]
 localPort = 3000
 externalPort = 80
-
-[[ports]]
-localPort = 3001
-externalPort = 3001
-
-[[ports]]
-localPort = 5432
-externalPort = 5432
-
-[[ports]]
-localPort = 8080
-externalPort = 8080
-
-[[ports]]
-localPort = 8081
-externalPort = 8081
-
-[[ports]]
-localPort = 19946
-externalPort = 3000
+exposeLocalhost = true

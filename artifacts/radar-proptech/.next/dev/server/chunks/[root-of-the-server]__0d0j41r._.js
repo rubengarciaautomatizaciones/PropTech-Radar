@@ -98,30 +98,34 @@ async function proxy(request) {
             setAll (cookiesToSet) {
                 try {
                     cookiesToSet.forEach(({ name, value, options })=>{
-                        // ----- LA CORRECCIÓN ESTÁ AQUÍ -----
-                        // La petición (request) solo necesita el nombre y el valor.
                         request.cookies.set(name, value);
-                        // La respuesta (response) necesita todo para enviarlo al navegador.
                         supabaseResponse.cookies.set(name, value, options);
                     });
                 } catch (e) {
-                // Ignorar errores
+                // Ignorar errores en lectura
                 }
             }
         }
     });
-    await supabase.auth.getUser();
+    // Autenticamos la sesión actual
+    const { data: { user } } = await supabase.auth.getUser();
+    const pathname = request.nextUrl.pathname;
+    const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname.startsWith('/verify-email');
+    const isDashboardRoute = pathname.startsWith('/dashboard');
+    // 1. Si no hay usuario y quiere entrar al dashboard -> Al login
+    if (isDashboardRoute && !user) {
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$server$2e$js__$5b$middleware$5d$__$28$ecmascript$29$__["NextResponse"].redirect(new URL('/login', request.url));
+    }
+    // 2. Si hay usuario y quiere entrar a rutas de auth -> Al dashboard
+    if (isAuthRoute && user) {
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$server$2e$js__$5b$middleware$5d$__$28$ecmascript$29$__["NextResponse"].redirect(new URL('/dashboard', request.url));
+    }
     return supabaseResponse;
 }
 const config = {
     matcher: [
         /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - /callback (LA RUTA DE AUTENTICACIÓN)
-     * - api (RUTAS PÚBLICAS PARA WEBHOOKS DE STRIPE, TELEGRAM, ETC)
+     * Ignora archivos estáticos, imágenes, favicon y webhooks (api)
      */ '/((?!_next/static|_next/image|favicon.ico|callback|api|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'
     ]
 };
