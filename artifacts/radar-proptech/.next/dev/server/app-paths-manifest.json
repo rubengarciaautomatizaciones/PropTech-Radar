@@ -1,6 +1,1 @@
-{
-  "/(marketing)/legal/privacidad/page": "app/(marketing)/legal/privacidad/page.js",
-  "/(marketing)/legal/terminos/page": "app/(marketing)/legal/terminos/page.js",
-  "/(marketing)/page": "app/(marketing)/page.js",
-  "/(marketing)/pro/page": "app/(marketing)/pro/page.js"
-}
+{}
