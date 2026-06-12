@@ -59,7 +59,7 @@ export default function LandingPage() {
           </p>
 
           {/* NUEVO FORMULARIO DE CAPTACIÓN INLINE */}
-          <div className="w-full max-w-md">
+          <div className="w-full max-w-md mt-4">
             {isSuccess ? (
               <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-start gap-3 animate-in fade-in zoom-in duration-500">
                 <CheckCircle2 className="w-5 h-5 text-kavox-success shrink-0 mt-0.5" />
@@ -82,7 +82,7 @@ export default function LandingPage() {
                 <button 
                   type="submit"
                   disabled={isSubmitting}
-                  className="absolute right-1.5 top-1.5 bottom-1.5 bg-slate-900 hover:bg-black text-white px-6 rounded-lg text-sm font-bold tracking-wide transition-colors disabled:opacity-70 flex items-center gap-2"
+                  className="absolute right-1.5 top-1.5 bottom-1.5 bg-kavox-accent hover:bg-teal-700 text-white px-6 rounded-lg text-sm font-bold tracking-wide transition-colors disabled:opacity-70 flex items-center gap-2"
                 >
                   {isSubmitting ? "Enviando..." : "Unirme"}
                 </button>
@@ -92,13 +92,13 @@ export default function LandingPage() {
         </div>
 
         {/* COLUMNA DERECHA: Réplica iOS Figma */}
-        <div className="w-full flex flex-col items-center justify-center animate-in fade-in duration-1000 delay-300 lg:translate-y-[25px]">
+        <div className="w-full flex flex-col items-center justify-center animate-in fade-in duration-1000 delay-300 ">
 
           {/* ========================================================= */}
-          {/* CONTROLES DE TAMAÑO (Cambia estos números para probar)    */}
+          {/* CONTROLES DE TAMAÑO (Usando ZOOM para máxima nitidez)     */}
           {/* ========================================================= */}
           <div 
-            className="w-full flex justify-center origin-center max-lg:[transform:scale(var(--scale-mobile))] lg:[transform:scale(var(--scale-pc))]"
+            className="w-full flex justify-center max-lg:[zoom:var(--scale-mobile)] lg:[zoom:var(--scale-pc)]"
             style={{ 
               "--scale-mobile": "0.85", /* Tamaño en MÓVIL */
               "--scale-pc": "0.75"      /* Tamaño en ORDENADOR */
@@ -108,7 +108,7 @@ export default function LandingPage() {
             <div className="relative z-10 transition-transform duration-700">
 
               {/* CHASSIS DEL IPHONE */}
-              <div className="relative w-[320px] h-[690px] bg-black rounded-[3.5rem] p-[4px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] border-[2px] border-gray-700/50 ring-4 ring-slate-900 antialiased [transform:translateZ(0)] backface-hidden" style={{ fontFamily: 'var(--font-inter), sans-serif', WebkitFontSmoothing: 'antialiased' }}>
+              <div className="relative w-[320px] h-[690px] bg-black rounded-[3.5rem] p-[4px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] border-[2px] border-gray-700/50 ring-4 ring-slate-900" style={{ fontFamily: 'var(--font-inter), sans-serif' }}>
 
                 {/* PANTALLA CONTENEDORA */}
                 <div className="w-full h-full bg-[#111] rounded-[3rem] overflow-hidden relative isolate">
@@ -184,14 +184,11 @@ export default function LandingPage() {
                       ========================================= */}
                   <div className="absolute bottom-[120px] left-3 right-3 z-50 animate-notify-enter">
 
-                    {/* Contenedor Físico (Añadido textRendering y translateZ para forzar nitidez) */}
-                    <div 
-                      className="w-full overflow-hidden flex flex-col animate-notify-expand shadow-[0_20px_40px_rgba(0,0,0,0.3)] border border-white/10 rounded-[22px] origin-bottom relative antialiased [transform:translateZ(0)] backface-hidden"
-                      style={{ textRendering: 'optimizeLegibility' }}
-                    >
+                    {/* Contenedor Físico (Limpiado de hacks 3D para máxima nitidez) */}
+                    <div className="w-full overflow-hidden flex flex-col animate-notify-expand shadow-[0_20px_40px_rgba(0,0,0,0.3)] border border-white/10 rounded-[22px] origin-bottom relative">
 
                       {/* --- VISTA 1: COLAPSADA --- */}
-                      <div className="absolute inset-0 p-3 flex items-center gap-3 animate-content-fade-out antialiased [transform:translateZ(0)] backface-hidden">
+                      <div className="absolute inset-0 p-3 flex items-center gap-3 animate-content-fade-out">
                         <img src="/icon.png" alt="KAVOX" className="w-9 h-9 rounded-lg object-cover shadow-sm bg-white border border-gray-200" />
                         <div className="flex-1">
                           <div className="flex justify-between items-center">
@@ -203,7 +200,7 @@ export default function LandingPage() {
                       </div>
 
                       {/* --- VISTA 2: EXPANDIDA (Texto Natural) --- */}
-                      <div className="absolute inset-0 p-4 flex flex-col animate-content-fade-in text-black antialiased [transform:translateZ(0)] backface-hidden">
+                      <div className="absolute inset-0 p-4 flex flex-col animate-content-fade-in text-black">
 
                         <div className="flex items-center gap-2 mb-2">
                           <img src="/icon.png" alt="KAVOX" className="w-6 h-6 rounded border border-gray-200 shadow-sm" />
@@ -234,14 +231,6 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
-          </div>
-
-          <div className="mt-8 text-kavox-accent font-bold text-[11px] tracking-widest uppercase opacity-80 flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-kavox-accent opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-kavox-accent"></span>
-            </span>
-            Simulación iOS en Tiempo Real
           </div>
         </div>
 
