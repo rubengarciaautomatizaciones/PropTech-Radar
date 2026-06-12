@@ -1,13 +1,50 @@
 {
   "pages": {
-    "/_app": []
+    "/_app": [
+      "static/chunks/02r5_next_dist_compiled_060a1k9._.js",
+      "static/chunks/02r5_next_dist_shared_lib_0i.m3-.._.js",
+      "static/chunks/02r5_next_dist_client_008ghsq._.js",
+      "static/chunks/02r5_next_dist_0-kog8e._.js",
+      "static/chunks/02r5_next_app_0xrmu11.js",
+      "static/chunks/[next]_entry_page-loader_ts_0uwg5bg._.js",
+      "static/chunks/0x1c_react-dom_0m7r6jt._.js",
+      "static/chunks/node_modules__pnpm_0yd3xlv._.js",
+      "static/chunks/[root-of-the-server]__0trmk_t._.js",
+      "static/chunks/artifacts_radar-proptech_pages__app_07xvfw~._.js",
+      "static/chunks/turbopack-artifacts_radar-proptech_pages__app_0de0f-.._.js"
+    ],
+    "/_error": [
+      "static/chunks/02r5_next_dist_compiled_060a1k9._.js",
+      "static/chunks/02r5_next_dist_shared_lib_0dl~ny7._.js",
+      "static/chunks/02r5_next_dist_client_008ghsq._.js",
+      "static/chunks/02r5_next_dist_0twf.vp._.js",
+      "static/chunks/[next]_entry_page-loader_ts_0jnnxsq._.js",
+      "static/chunks/0x1c_react-dom_0m7r6jt._.js",
+      "static/chunks/node_modules__pnpm_0yd3xlv._.js",
+      "static/chunks/[root-of-the-server]__0lwyj_n._.js",
+      "static/chunks/artifacts_radar-proptech_pages__error_07xvfw~._.js",
+      "static/chunks/turbopack-artifacts_radar-proptech_pages__error_05lm6d1._.js"
+    ]
   },
   "devFiles": [],
-  "polyfillFiles": [],
+  "polyfillFiles": [
+    "static/chunks/02r5_next_dist_build_polyfills_polyfill-nomodule.js"
+  ],
   "lowPriorityFiles": [
     "static/development/_buildManifest.js",
     "static/development/_ssgManifest.js",
     "static/development/_clientMiddlewareManifest.js"
   ],
-  "rootMainFiles": []
+  "rootMainFiles": [
+    "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_13yv523._.js",
+    "static/chunks/02r5_next_dist_compiled_next-devtools_index_130yepj.js",
+    "static/chunks/02r5_next_dist_compiled_react-dom_0p8aanz._.js",
+    "static/chunks/02r5_next_dist_compiled_react-server-dom-turbopack_0anukjv._.js",
+    "static/chunks/02r5_next_dist_compiled_0_tw3ir._.js",
+    "static/chunks/02r5_next_dist_client_0kp5.-q._.js",
+    "static/chunks/02r5_next_dist_03jkh29._.js",
+    "static/chunks/0i4a_@swc_helpers_cjs_0hvz.20._.js",
+    "static/chunks/artifacts_radar-proptech_0rqeker._.js",
+    "static/chunks/turbopack-artifacts_radar-proptech_0s-av.3._.js"
+  ]
 }
