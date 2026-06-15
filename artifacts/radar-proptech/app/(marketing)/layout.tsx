@@ -11,14 +11,6 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
           <Link href="/" className="font-heading font-bold text-2xl tracking-[0.15em] text-slate-900 flex items-center">
             KAVO<span className="text-kavox-accent">X</span>
           </Link>
-
-          {/* Login de clientes */}
-          <Link 
-            href="/login" 
-            className="text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors uppercase tracking-widest"
-          >
-            Acceso Clientes
-          </Link>
         </div>
       </header>
 
