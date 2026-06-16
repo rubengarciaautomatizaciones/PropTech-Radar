@@ -30,7 +30,7 @@ export async function sendSupportTicket(formData: FormData) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'KAVOX System <hola@kavox.tech>', // Debe ser un correo verificado en Resend
+        from: 'KAVOX System <info@kavox.tech>', // Debe ser un correo verificado en Resend
         to: 'info@kavox.tech', // A dónde te llegará el mensaje
         reply_to: user.email, // Si le das a "Responder" en tu email, le responderá al cliente
         subject: `TICKET SOPORTE: ${subject}`,

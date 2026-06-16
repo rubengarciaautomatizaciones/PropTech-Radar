@@ -123,7 +123,7 @@ export async function addAgent(formData: FormData) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'KAVOX System <hola@kavox.tech>',
+          from: 'KAVOX System <info@kavox.tech>',
           to: email,
           subject: `Acceso concedido a KAVOX para ${agencyName}`,
           html: htmlContent
