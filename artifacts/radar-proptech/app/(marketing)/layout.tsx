@@ -10,7 +10,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       <header className="sticky top-0 h-20 shrink-0 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center z-50">
         <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
           <Link href="/" className="font-heading font-bold text-2xl tracking-[0.15em] text-slate-900 flex items-center">
-            KAVO<span className="text-kavox-accent">X</span>
+            <span className="text-kavox-accent">K</span>AVOX
           </Link>
         </div>
       </header>
