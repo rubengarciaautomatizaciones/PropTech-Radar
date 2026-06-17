@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ChevronRight, SignalHigh } from "lucide-react";
 import { subscribeEmail } from "./actions/subscribe";
-import { CheckCircle2 } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 
 export default function LandingPage() {
   const [time, setTime] = useState<Date | null>(null);
@@ -74,11 +74,11 @@ export default function LandingPage() {
           {/* 4. CAMBIO: Quitamos mt-4 y añadimos mb-12 para forzar espacio vacío debajo del formulario */}
           <div className="w-full max-w-md mb-12 lg:mb-0">
             {isSuccess ? (
-              <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-start gap-3 animate-in fade-in zoom-in duration-500">
-                <CheckCircle2 className="w-5 h-5 text-kavox-success shrink-0 mt-0.5" />
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3 animate-in fade-in zoom-in duration-500">
+                <CheckCircle2 className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="text-sm font-bold text-green-900">¡Casi listo!</h3>
-                  <p className="text-sm text-green-800 mt-1 leading-relaxed">
+                  <h3 className="text-sm font-bold text-amber-900">¡Casi listo!</h3>
+                  <p className="text-sm text-amber-800 mt-1 leading-relaxed">
                     Revisa tu bandeja de entrada (y la carpeta de spam). Haz clic en el enlace que te acabamos de enviar para confirmar tu acceso.
                   </p>
                 </div>
