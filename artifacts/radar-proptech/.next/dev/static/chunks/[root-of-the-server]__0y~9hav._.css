@@ -2411,10 +2411,6 @@ img, video {
   opacity: .75;
 }
 
-.opacity-80 {
-  opacity: .8;
-}
-
 .opacity-90 {
   opacity: .9;
 }
@@ -2587,10 +2583,6 @@ img, video {
 
 .ease-out {
   transition-timing-function: cubic-bezier(0, 0, .2, 1);
-}
-
-.\[transform\:translateZ\(0\)\] {
-  transform: translateZ(0);
 }
 
 .selection\:bg-kavox-accent ::selection {
@@ -2914,10 +2906,6 @@ img, video {
 }
 
 @media not all and (min-width: 1024px) {
-  .max-lg\:\[transform\:scale\(var\(--scale-mobile\)\)\] {
-    transform: scale(var(--scale-mobile));
-  }
-
   .max-lg\:\[zoom\:var\(--scale-mobile\)\] {
     zoom: var(--scale-mobile);
   }
@@ -2987,26 +2975,6 @@ img, video {
     margin-right: 0;
   }
 
-  .lg\:translate-y-\[25px\] {
-    --tw-translate-y: 25px;
-    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-  }
-
-  .lg\:translate-y-\[250px\] {
-    --tw-translate-y: 250px;
-    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-  }
-
-  .lg\:translate-y-\[20px\] {
-    --tw-translate-y: 20px;
-    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-  }
-
-  .lg\:translate-y-\[10px\] {
-    --tw-translate-y: 10px;
-    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
-  }
-
   .lg\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -3044,10 +3012,6 @@ img, video {
   .lg\:text-7xl {
     font-size: 4.5rem;
     line-height: 1;
-  }
-
-  .lg\:\[transform\:scale\(var\(--scale-pc\)\)\] {
-    transform: scale(var(--scale-pc));
   }
 
   .lg\:\[zoom\:var\(--scale-pc\)\] {

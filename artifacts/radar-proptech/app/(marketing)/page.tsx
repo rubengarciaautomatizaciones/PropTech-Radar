@@ -52,11 +52,24 @@ export default function LandingPage() {
             Cierra más exclusivas llegando antes que tu competencia.
           </h1>
 
-          <p className="text-lg text-slate-600 leading-relaxed max-w-lg mb-10">
-            El primero que llama, se lleva el cliente.<br />
-            Deja de perder captaciones por llegar horas tarde.<br />
-            KAVOX intercepta los anuncios de particulares al momento en el que son publicados y te avisa al móvil. Mientras otros actualizan Idealista, tú ya estás al teléfono.
-          </p>
+          <div className="text-lg text-slate-600 leading-relaxed max-w-lg mb-10 space-y-4">
+            <div className="flex items-start gap-3">
+              <svg className="w-5 h-5 text-kavox-accent shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 10 20 15 15 20"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></svg>
+              <p>El primero que llama, se lleva el cliente.</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <svg className="w-5 h-5 text-kavox-accent shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 10 20 15 15 20"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></svg>
+              <p>Deja de perder captaciones por llegar horas tarde.</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <svg className="w-5 h-5 text-kavox-accent shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 10 20 15 15 20"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></svg>
+              <p>KAVOX intercepta los anuncios de particulares al momento en el que son publicados y te avisa al móvil.</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <svg className="w-5 h-5 text-kavox-accent shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 10 20 15 15 20"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></svg>
+              <p>Mientras otros actualizan Idealista, tú ya estás al teléfono.</p>
+            </div>
+          </div>
 
           {/* NUEVO FORMULARIO DE CAPTACIÓN INLINE */}
           <div className="w-full max-w-md mt-4">
