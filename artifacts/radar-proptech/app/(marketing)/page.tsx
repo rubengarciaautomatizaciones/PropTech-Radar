@@ -75,7 +75,7 @@ export default function LandingPage() {
           <div className="w-full max-w-md mb-12 lg:mb-0">
             {isSuccess ? (
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3 animate-in fade-in zoom-in duration-500">
-                <CheckCircle2 className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                 <div>
                   <h3 className="text-sm font-bold text-amber-900">¡Casi listo!</h3>
                   <p className="text-sm text-amber-800 mt-1 leading-relaxed">
