@@ -52,7 +52,7 @@ export default function LandingPage() {
           </h1>
 
           {/* 3. CAMBIO: Reducimos mb-10 a mb-6 y space-y-4 a space-y-3 para compactar la lista */}
-          <div className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-lg mb-6 space-y-3">
+          <div className="text-base sm:text-base text-slate-600 leading-relaxed max-w-lg mb-6 space-y-3">
             <div className="flex items-start gap-3">
               <svg className="w-5 h-5 text-kavox-accent shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 10 20 15 15 20"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></svg>
               <p>El primero que llama, se lleva el cliente.</p>
