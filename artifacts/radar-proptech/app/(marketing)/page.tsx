@@ -2,8 +2,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import { ChevronRight, SignalHigh } from "lucide-react";
 import { subscribeEmail } from "./actions/subscribe";
 import { AlertTriangle } from "lucide-react";
 
@@ -32,27 +30,31 @@ export default function LandingPage() {
   const dateStr = time ? time.toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" }) : "martes, 24 de octubre";
 
   return (
-    // 1. CAMBIO: min-h-full y py-12 para que la página respire y no se corte
-    <div className="w-full min-h-full flex items-center py-12 lg:py-0">
-      <section className="w-full max-w-7xl mx-auto px-6 lg:px-8 grid lg:grid-cols-2 gap-16 lg:gap-8 items-center">
+    <div className="w-full flex-1 flex items-start lg:items-center pt-12 pb-24 lg:py-0">
+      {/* 1. MARGEN LATERAL: Cambiamos px-6 por px-8 (o px-10 si quieres aún más margen en móvil). Mantenemos lg:px-8 para PC. */}
+      <section className="w-full max-w-7xl mx-auto px-8 lg:px-8 grid lg:grid-cols-2 gap-16 lg:gap-8 items-center">
 
         {/* COLUMNA IZQUIERDA: Copy */}
-        <div className="flex flex-col items-center lg:items-start text-center lg:text-left animate-in fade-in slide-in-from-bottom-8 duration-700">
+        <div className="flex flex-col items-start text-left animate-in fade-in slide-in-from-bottom-8 duration-700">
+
+          {/* 2. ETIQUETA RESTAURADA: Vuelve a estar aquí con el texto "Lista de espera" */}
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-slate-600 text-[10px] font-bold uppercase tracking-widest mb-6 shadow-sm">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-kavox-accent opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-kavox-accent"></span>
             </span>
-            Beta Privada: 50 Plazas
+            Lista de espera
           </div>
 
-          {/* 2. CAMBIO: Reducimos el mb-6 a mb-5 para subir el contenido */}
-          <h1 className="font-heading font-bold text-4xl sm:text-5xl lg:text-6xl text-slate-900 leading-[1.1] tracking-tight mb-5">
-            Cierra más exclusivas llegando antes que tu competencia.
+          {/* 3. TÍTULO: Usamos <br className="block lg:hidden" /> para forzar el salto SOLO en móvil. En PC se ignora. */}
+          <h1 className="font-heading font-bold text-4xl sm:text-5xl lg:text-6xl text-slate-900 leading-[1.1] tracking-tight mb-8">
+            Cierra más exclusivas <br className="block lg:hidden" />
+            llegando antes que <br className="block lg:hidden" />
+            tu competencia.
           </h1>
 
-          {/* 3. CAMBIO: Reducimos mb-10 a mb-6 y space-y-4 a space-y-3 para compactar la lista */}
-          <div className="text-base sm:text-base text-slate-600 leading-relaxed max-w-lg mb-6 space-y-3">
+          {/* CAMBIO: mb-8 para dar la misma separación exacta hacia la caja del email */}
+          <div className="text-base sm:text-base text-slate-600 leading-relaxed max-w-lg mb-8 space-y-3">
             <div className="flex items-start gap-3">
               <svg className="w-5 h-5 text-kavox-accent shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 10 20 15 15 20"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></svg>
               <p>El primero que llama, se lleva el cliente.</p>
@@ -71,7 +73,6 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* 4. CAMBIO: Quitamos mt-4 y añadimos mb-12 para forzar espacio vacío debajo del formulario */}
           <div className="w-full max-w-md mb-12 lg:mb-0">
             {isSuccess ? (
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3 animate-in fade-in zoom-in duration-500">
@@ -79,7 +80,8 @@ export default function LandingPage() {
                 <div>
                   <h3 className="text-sm font-bold text-amber-900">¡Casi listo!</h3>
                   <p className="text-sm text-amber-800 mt-1 leading-relaxed">
-                    Revisa tu bandeja de entrada (y la carpeta de spam). Haz clic en el enlace que te acabamos de enviar para confirmar tu acceso.
+                    Revisa tu bandeja de entrada (y la carpeta de spam).<br />
+                    Haz clic en el enlace que te acabamos de enviar para confirmar tu acceso.
                   </p>
                 </div>
               </div>
@@ -105,7 +107,7 @@ export default function LandingPage() {
         </div>
 
         {/* COLUMNA DERECHA: Réplica iOS Figma */}
-        <div className="w-full flex flex-col items-center justify-center animate-in fade-in duration-1000 delay-300 ">
+        <div className="w-full flex flex-col items-center justify-center animate-in fade-in duration-1000 delay-300 mb-12 lg:mb-0">
           <div 
             className="w-full flex justify-center max-lg:[zoom:var(--scale-mobile)] lg:[zoom:var(--scale-pc)]"
             style={{ 
@@ -126,7 +128,7 @@ export default function LandingPage() {
                   </div>
 
                   {/* STATUS BAR iOS */}
-                  <div className="absolute top-0 inset-x-0 h-14 px-6 flex justify-between items-center text-white z-30">
+                  <div className="absolute top-0 inset-x-0 h-10 lg:h-14 px-4 lg:px-6 flex justify-between items-start pt-3 lg:items-center lg:pt-0 text-white z-30">
                     <span className="text-[14px] font-semibold tracking-tight">
                       {time ? `${hours}:${minutes}` : "09:41"}
                     </span>
@@ -174,35 +176,42 @@ export default function LandingPage() {
                   <div className="absolute inset-0 bg-black/15 backdrop-blur-[15px] z-40 animate-bg-dim pointer-events-none"></div>
 
                   {/* NOTIFICACIÓN */}
-                  <div className="absolute bottom-[120px] left-3 right-3 z-50 animate-notify-enter">
-                    <div className="w-full overflow-hidden flex flex-col animate-notify-expand shadow-[0_20px_40px_rgba(0,0,0,0.3)] border border-white/10 rounded-[22px] origin-bottom relative">
-                      <div className="absolute inset-0 p-3 flex items-center gap-3 animate-content-fade-out">
-                        <img src="/icon.png" alt="KAVOX" className="w-9 h-9 rounded-lg object-cover shadow-sm bg-white border border-gray-200" />
+                  <div className="absolute bottom-[130px] left-3 right-3 z-50 animate-notify-enter">
+                    <div className="w-full overflow-hidden flex flex-col max-lg:animate-notify-expand-mobile lg:animate-notify-expand-pc shadow-[0_20px_40px_rgba(0,0,0,0.3)] border border-white/10 rounded-[22px] origin-bottom relative">
+
+                      {/* --- VISTA 1: COLAPSADA --- */}
+                      <div className="absolute inset-0 p-2.5 lg:p-3 flex items-center gap-2 lg:gap-3 animate-content-fade-out">
+                        <img src="/icon.png" alt="KAVOX" className="w-7 h-7 lg:w-9 lg:h-9 rounded-lg object-cover shadow-sm bg-white border border-gray-200" />
                         <div className="flex-1">
                           <div className="flex justify-between items-center">
-                            <span className="text-[13px] font-bold text-black tracking-wide">KAVOX</span>
-                            <span className="text-[12px] text-gray-500 font-medium">ahora</span>
+                            <span className="text-[11px] lg:text-[13px] font-bold text-black tracking-wide">KAVOX</span>
+                            <span className="text-[10px] lg:text-[12px] text-gray-500 font-medium">ahora</span>
                           </div>
-                          <p className="text-[14px] font-medium text-black leading-tight mt-0.5">NUEVO LEAD en Madrid</p>
+                          <p className="text-[12px] lg:text-[14px] font-medium text-black leading-tight mt-0.5">NUEVO LEAD en Madrid</p>
                         </div>
                       </div>
-                      <div className="absolute inset-0 p-4 flex flex-col animate-content-fade-in text-black">
-                        <div className="flex items-center gap-2 mb-2">
-                          <img src="/icon.png" alt="KAVOX" className="w-6 h-6 rounded border border-gray-200 shadow-sm" />
-                          <span className="text-[12px] font-bold uppercase tracking-widest text-gray-500">Alerta Radar</span>
+
+                      {/* --- VISTA 2: EXPANDIDA --- */}
+                      <div className="absolute inset-0 p-3 lg:p-4 flex flex-col animate-content-fade-in text-black">
+                        <div className="flex items-center gap-2 mb-1 lg:mb-2">
+                          <img src="/icon.png" alt="KAVOX" className="w-5 h-5 lg:w-6 lg:h-6 rounded border border-gray-200 shadow-sm" />
+                          <span className="text-[10px] lg:text-[12px] font-bold uppercase tracking-widest text-gray-500">Alerta Radar</span>
                         </div>
-                        <div className="flex-1 mt-1">
-                          <p className="text-[14px] text-black leading-relaxed">
+
+                        <div className="flex-1 mt-0.5 lg:mt-1">
+                          <p className="text-[11px] lg:text-[14px] text-black leading-relaxed">
                             <strong>Zona:</strong> Madrid Centro<br/>
                             <strong>Inmueble:</strong> Ático exterior reformado<br/>
                             <strong>Tamaño:</strong> 120 m² - 3 Hab. / 2 Baños<br/>
                             <strong>Precio:</strong> 650.000 €
                           </p>
                         </div>
-                        <button className="w-full bg-[#008799] text-white py-3.5 rounded-[14px] font-bold mt-auto text-[15px] tracking-wide active:scale-95 transition-transform flex items-center justify-center">
+
+                        <button className="w-full bg-[#008799] text-white py-2 lg:py-3.5 rounded-[10px] lg:rounded-[14px] font-bold mt-auto text-[13px] lg:text-[15px] tracking-wide active:scale-95 transition-transform flex items-center justify-center">
                           LLAMAR
                         </button>
                       </div>
+
                     </div>
                   </div>
 

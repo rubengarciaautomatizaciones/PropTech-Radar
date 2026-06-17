@@ -37,11 +37,17 @@ const config: Config = {
           "48%, 85%": { opacity: "1", transform: "translateY(0) scale(1)" }, 
           "88%, 100%": { opacity: "0", transform: "translateY(20px) scale(0.95)" }, 
         },
-        /* ALTURA REDUCIDA A 250px PARA ELIMINAR EL ESPACIO VACÍO */
-        "notify-expand-bottom": {
+        /* ANIMACIÓN PARA PC (Intacta, no se toca) */
+        "notify-expand-pc": {
           "0%, 46%": { height: "70px", padding: "12px", backgroundColor: "rgba(225, 225, 225, 0.95)" },
           "48%, 85%": { height: "230px", padding: "16px", backgroundColor: "rgba(250, 250, 250, 1)" },
           "88%, 100%": { height: "70px", padding: "12px", backgroundColor: "rgba(225, 225, 225, 0.95)" },
+        },
+        /* ANIMACIÓN PARA MÓVIL (Ajustable) */
+        "notify-expand-mobile": {
+          "0%, 46%": { height: "60px", padding: "10px", backgroundColor: "rgba(225, 225, 225, 0.95)" },
+          "48%, 85%": { height: "190px", padding: "12px", backgroundColor: "rgba(250, 250, 250, 1)" },
+          "88%, 100%": { height: "60px", padding: "10px", backgroundColor: "rgba(225, 225, 225, 0.95)" },
         },
         "content-fade-out": {
           "0%, 45%": { opacity: "1", visibility: "visible" },
@@ -66,7 +72,8 @@ const config: Config = {
       animation: {
         "slide-down": "slide-down 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "notify-enter": "notify-enter-bottom 10s ease-in-out infinite",
-        "notify-expand": "notify-expand-bottom 10s ease-in-out infinite",
+        "notify-expand-pc": "notify-expand-pc 10s ease-in-out infinite",
+        "notify-expand-mobile": "notify-expand-mobile 10s ease-in-out infinite",
         "content-fade-out": "content-fade-out 10s ease-in-out infinite",
         "content-fade-in": "content-fade-in 10s ease-in-out infinite",
         "bg-dim": "bg-dim 10s ease-in-out infinite",

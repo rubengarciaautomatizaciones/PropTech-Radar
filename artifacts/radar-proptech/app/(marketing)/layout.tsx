@@ -1,9 +1,13 @@
+// artifacts/radar-proptech/app/(marketing)/layout.tsx
 import Link from "next/link";
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="h-screen flex flex-col bg-[#f8fafc] font-sans text-slate-900 overflow-hidden">
-      <header className="h-20 shrink-0 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center z-50">
+    // Quitamos h-screen y overflow-hidden para dejar que el body haga el scroll natural
+    <div className="min-h-screen flex flex-col bg-[#f8fafc] font-sans text-slate-900">
+
+      {/* Añadimos sticky top-0 para que la navbar se quede pegada arriba siempre */}
+      <header className="sticky top-0 h-20 shrink-0 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center z-50">
         <div className="w-full max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
           <Link href="/" className="font-heading font-bold text-2xl tracking-[0.15em] text-slate-900 flex items-center">
             KAVO<span className="text-kavox-accent">X</span>
@@ -11,8 +15,8 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         </div>
       </header>
 
-      {/* ALERTA: overflow-x-hidden mata el scroll fantasma, overflow-y-auto permite leer en móvil */}
-      <main className="flex-1 min-h-0 flex flex-col overflow-y-auto overflow-x-hidden">
+      {/* El main ya no necesita overflow-y-auto, crece de forma natural */}
+      <main className="flex-1 flex flex-col">
         {children}
       </main>
 
