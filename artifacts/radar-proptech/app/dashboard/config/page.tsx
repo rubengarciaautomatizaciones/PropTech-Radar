@@ -1,4 +1,3 @@
-// artifacts/radar-proptech/app/dashboard/config/page.tsx
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import ConfigWizard from "./ConfigWizard"; 
@@ -17,8 +16,6 @@ export default async function ConfigRouter() {
     .single();
 
   const hasAgency = !!userData?.id_agencia;
-
-  // Extraemos el nombre de la agencia que puso al registrarse en /signup
   const agencyNameFromAuth = user.user_metadata?.agency_name || "";
 
   let radares: any[] = [];
@@ -33,9 +30,8 @@ export default async function ConfigRouter() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto animate-in fade-in duration-500">
+    <div className="max-w-5xl mx-auto p-6 lg:p-8 animate-in fade-in duration-500">
       {!hasAgency ? (
-        // Le pasamos el nombre pre-cargado como prop
         <ConfigWizard initialAgencyName={agencyNameFromAuth} />
       ) : (
         <ManageRadars initialRadars={radares} />

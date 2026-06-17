@@ -1,4 +1,3 @@
-// artifacts/radar-proptech/app/dashboard/layout.tsx
 import Sidebar from "@/components/Sidebar";
 import { createClient } from "@/lib/supabase/server";
 
@@ -24,9 +23,9 @@ export default async function DashboardLayout({
 
   return (
     <div className="h-screen w-full flex bg-kavox-surface overflow-hidden">
-      {/* Pasamos únicamente el rol de forma segura */}
       <Sidebar rol={rol} />
-      <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+      {/* ALERTA: Cambiamos overflow-hidden por overflow-y-auto */}
+      <main className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
         {children}
       </main>
     </div>

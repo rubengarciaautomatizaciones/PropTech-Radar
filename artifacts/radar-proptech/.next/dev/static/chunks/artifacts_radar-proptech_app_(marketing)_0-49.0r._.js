@@ -35,7 +35,6 @@ var _s = __turbopack_context__.k.signature();
 ;
 function LandingPage() {
     _s();
-    // SSR FIX: Evitamos que Next.js se congele al intentar renderizar fechas en servidor vs cliente.
     const [time, setTime] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [isSubmitting, setIsSubmitting] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [isSuccess, setIsSuccess] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
@@ -58,7 +57,6 @@ function LandingPage() {
             })["LandingPage.useEffect"];
         }
     }["LandingPage.useEffect"], []);
-    // Separamos horas y minutos para poder centrar los dos puntos (:)
     const hours = time ? time.getHours().toString().padStart(2, '0') : "09";
     const minutes = time ? time.getMinutes().toString().padStart(2, '0') : "41";
     const dateStr = time ? time.toLocaleDateString("es-ES", {
@@ -66,11 +64,11 @@ function LandingPage() {
         day: "numeric",
         month: "long"
     }) : "martes, 24 de octubre";
-    return(// AÑADIDO: overflow-hidden para matar el scroll fantasma
+    return(// 1. CAMBIO: min-h-full y py-12 para que la página respire y no se corte
     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "w-full h-full flex items-center overflow-hidden",
+        className: "w-full min-h-full flex items-center py-12 lg:py-0",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
-            className: "w-full max-w-7xl mx-auto px-8 grid lg:grid-cols-2 gap-12 lg:gap-8 items-center py-10 lg:py-0",
+            className: "w-full max-w-7xl mx-auto px-6 lg:px-8 grid lg:grid-cols-2 gap-16 lg:gap-8 items-center",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "flex flex-col items-center lg:items-start text-center lg:text-left animate-in fade-in slide-in-from-bottom-8 duration-700",
@@ -85,39 +83,39 @@ function LandingPage() {
                                             className: "animate-ping absolute inline-flex h-full w-full rounded-full bg-kavox-accent opacity-75"
                                         }, void 0, false, {
                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                            lineNumber: 45,
+                                            lineNumber: 43,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             className: "relative inline-flex rounded-full h-2 w-2 bg-kavox-accent"
                                         }, void 0, false, {
                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                            lineNumber: 46,
+                                            lineNumber: 44,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                    lineNumber: 44,
+                                    lineNumber: 42,
                                     columnNumber: 13
                                 }, this),
                                 "Beta Privada: 50 Plazas"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                            lineNumber: 43,
+                            lineNumber: 41,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                            className: "font-heading font-bold text-5xl lg:text-6xl text-slate-900 leading-[1.05] tracking-tight mb-6",
+                            className: "font-heading font-bold text-4xl sm:text-5xl lg:text-6xl text-slate-900 leading-[1.1] tracking-tight mb-5",
                             children: "Cierra más exclusivas llegando antes que tu competencia."
                         }, void 0, false, {
                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                            lineNumber: 51,
+                            lineNumber: 50,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "text-lg text-slate-600 leading-relaxed max-w-lg mb-10 space-y-4",
+                            className: "text-base sm:text-lg text-slate-600 leading-relaxed max-w-lg mb-6 space-y-3",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "flex items-start gap-3",
@@ -306,7 +304,7 @@ function LandingPage() {
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "w-full max-w-md mt-4",
+                            className: "w-full max-w-md mb-12 lg:mb-0",
                             children: isSuccess ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "bg-green-50 border border-green-200 rounded-xl p-4 flex items-start gap-3 animate-in fade-in zoom-in duration-500",
                                 children: [
@@ -355,7 +353,7 @@ function LandingPage() {
                                         name: "email",
                                         required: true,
                                         placeholder: "tu@correo.com",
-                                        className: "w-full py-4 pl-5 pr-[140px] text-slate-900 outline-none text-sm font-medium placeholder:text-gray-400"
+                                        className: "w-full py-4 pl-5 pr-[120px] sm:pr-[140px] text-slate-900 outline-none text-sm font-medium placeholder:text-gray-400"
                                     }, void 0, false, {
                                         fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
                                         lineNumber: 88,
@@ -364,7 +362,7 @@ function LandingPage() {
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                         type: "submit",
                                         disabled: isSubmitting,
-                                        className: "absolute right-1.5 top-1.5 bottom-1.5 bg-kavox-accent hover:bg-teal-700 text-white px-6 rounded-lg text-sm font-bold tracking-wide transition-colors disabled:opacity-70 flex items-center gap-2",
+                                        className: "absolute right-1.5 top-1.5 bottom-1.5 bg-kavox-accent hover:bg-teal-700 text-white px-4 sm:px-6 rounded-lg text-sm font-bold tracking-wide transition-colors disabled:opacity-70 flex items-center gap-2",
                                         children: isSubmitting ? "Enviando..." : "Unirme"
                                     }, void 0, false, {
                                         fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
@@ -385,7 +383,7 @@ function LandingPage() {
                     ]
                 }, void 0, true, {
                     fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                    lineNumber: 42,
+                    lineNumber: 40,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -394,7 +392,7 @@ function LandingPage() {
                         className: "w-full flex justify-center max-lg:[zoom:var(--scale-mobile)] lg:[zoom:var(--scale-pc)]",
                         style: {
                             "--scale-mobile": "0.85",
-                            /* Tamaño en MÓVIL */ "--scale-pc": "0.75" /* Tamaño en ORDENADOR */ 
+                            "--scale-pc": "0.75"
                         },
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "relative z-10 transition-transform duration-700",
@@ -415,25 +413,25 @@ function LandingPage() {
                                                         className: "absolute top-[2px] left-[3px] w-[2px] h-[2px] bg-[#686D95] rounded-full blur-[1px]"
                                                     }, void 0, false, {
                                                         fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                        lineNumber: 132,
+                                                        lineNumber: 123,
                                                         columnNumber: 25
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                    lineNumber: 131,
+                                                    lineNumber: 122,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     className: "w-2.5 h-2.5 rounded-full bg-white/10 shadow-inner"
                                                 }, void 0, false, {
                                                     fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                    lineNumber: 134,
+                                                    lineNumber: 125,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                            lineNumber: 130,
+                                            lineNumber: 121,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -444,7 +442,7 @@ function LandingPage() {
                                                     children: time ? `${hours}:${minutes}` : "09:41"
                                                 }, void 0, false, {
                                                     fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                    lineNumber: 139,
+                                                    lineNumber: 130,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -457,34 +455,34 @@ function LandingPage() {
                                                                     className: "w-[2.5px] h-[4px] bg-white rounded-sm"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                    lineNumber: 147,
+                                                                    lineNumber: 135,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                     className: "w-[2.5px] h-[6px] bg-white rounded-sm"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                    lineNumber: 148,
+                                                                    lineNumber: 136,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                     className: "w-[2.5px] h-[8px] bg-white rounded-sm"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                    lineNumber: 149,
+                                                                    lineNumber: 137,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                     className: "w-[2.5px] h-[10px] bg-white rounded-sm"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                    lineNumber: 150,
+                                                                    lineNumber: 138,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                            lineNumber: 146,
+                                                            lineNumber: 134,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -492,7 +490,7 @@ function LandingPage() {
                                                             children: "5G"
                                                         }, void 0, false, {
                                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                            lineNumber: 154,
+                                                            lineNumber: 140,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -504,44 +502,44 @@ function LandingPage() {
                                                                         className: "w-[85%] h-full bg-white rounded-[1.5px]"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                        lineNumber: 159,
+                                                                        lineNumber: 143,
                                                                         columnNumber: 27
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                    lineNumber: 158,
+                                                                    lineNumber: 142,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                     className: "w-[1.5px] h-[4px] bg-white/40 rounded-r-sm ml-[1px]"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                    lineNumber: 161,
+                                                                    lineNumber: 145,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                            lineNumber: 157,
+                                                            lineNumber: 141,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                    lineNumber: 143,
+                                                    lineNumber: 133,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                            lineNumber: 138,
+                                            lineNumber: 129,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "absolute inset-0 bg-gradient-to-b from-[#4A4A4A] to-[#0A0A0A]"
                                         }, void 0, false, {
                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                            lineNumber: 167,
+                                            lineNumber: 151,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -555,7 +553,7 @@ function LandingPage() {
                                                             children: time ? dateStr : "martes, 24 de octubre"
                                                         }, void 0, false, {
                                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                            lineNumber: 172,
+                                                            lineNumber: 156,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -570,20 +568,20 @@ function LandingPage() {
                                                                     children: ":"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                    lineNumber: 177,
+                                                                    lineNumber: 160,
                                                                     columnNumber: 32
                                                                 }, this),
                                                                 minutes
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                            lineNumber: 176,
+                                                            lineNumber: 159,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                    lineNumber: 171,
+                                                    lineNumber: 155,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -601,17 +599,17 @@ function LandingPage() {
                                                                     d: "M7 2h10v3l-3 4v11a2 2 0 01-2 2h-4a2 2 0 01-2-2v-11l-3-4v-3z"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                    lineNumber: 184,
+                                                                    lineNumber: 165,
                                                                     columnNumber: 121
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                lineNumber: 184,
+                                                                lineNumber: 165,
                                                                 columnNumber: 25
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                            lineNumber: 183,
+                                                            lineNumber: 164,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -626,36 +624,36 @@ function LandingPage() {
                                                                     d: "M4 6h3l1-2h8l1 2h3a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2zm8 11a5 5 0 100-10 5 5 0 000 10z"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                    lineNumber: 187,
+                                                                    lineNumber: 168,
                                                                     columnNumber: 121
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                lineNumber: 187,
+                                                                lineNumber: 168,
                                                                 columnNumber: 25
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                            lineNumber: 186,
+                                                            lineNumber: 167,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                    lineNumber: 182,
+                                                    lineNumber: 163,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                            lineNumber: 170,
+                                            lineNumber: 154,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "absolute inset-0 bg-black/15 backdrop-blur-[15px] z-40 animate-bg-dim pointer-events-none"
                                         }, void 0, false, {
                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                            lineNumber: 193,
+                                            lineNumber: 174,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -672,7 +670,7 @@ function LandingPage() {
                                                                 className: "w-9 h-9 rounded-lg object-cover shadow-sm bg-white border border-gray-200"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                lineNumber: 205,
+                                                                lineNumber: 180,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -686,7 +684,7 @@ function LandingPage() {
                                                                                 children: "KAVOX"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                                lineNumber: 208,
+                                                                                lineNumber: 183,
                                                                                 columnNumber: 29
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -694,13 +692,13 @@ function LandingPage() {
                                                                                 children: "ahora"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                                lineNumber: 209,
+                                                                                lineNumber: 184,
                                                                                 columnNumber: 29
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                        lineNumber: 207,
+                                                                        lineNumber: 182,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -708,19 +706,19 @@ function LandingPage() {
                                                                         children: "NUEVO LEAD en Madrid"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                        lineNumber: 211,
+                                                                        lineNumber: 186,
                                                                         columnNumber: 27
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                lineNumber: 206,
+                                                                lineNumber: 181,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                        lineNumber: 204,
+                                                        lineNumber: 179,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -735,7 +733,7 @@ function LandingPage() {
                                                                         className: "w-6 h-6 rounded border border-gray-200 shadow-sm"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                        lineNumber: 219,
+                                                                        lineNumber: 191,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -743,13 +741,13 @@ function LandingPage() {
                                                                         children: "Alerta Radar"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                        lineNumber: 220,
+                                                                        lineNumber: 192,
                                                                         columnNumber: 27
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                lineNumber: 218,
+                                                                lineNumber: 190,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -761,58 +759,58 @@ function LandingPage() {
                                                                             children: "Zona:"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                            lineNumber: 226,
+                                                                            lineNumber: 196,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         " Madrid Centro",
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                            lineNumber: 226,
+                                                                            lineNumber: 196,
                                                                             columnNumber: 65
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
                                                                             children: "Inmueble:"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                            lineNumber: 227,
+                                                                            lineNumber: 197,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         " Ático exterior reformado",
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                            lineNumber: 227,
+                                                                            lineNumber: 197,
                                                                             columnNumber: 80
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
                                                                             children: "Tamaño:"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                            lineNumber: 228,
+                                                                            lineNumber: 198,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         " 120 m² - 3 Hab. / 2 Baños",
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                            lineNumber: 228,
+                                                                            lineNumber: 198,
                                                                             columnNumber: 79
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
                                                                             children: "Precio:"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                            lineNumber: 229,
+                                                                            lineNumber: 199,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         " 650.000 €"
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                    lineNumber: 225,
+                                                                    lineNumber: 195,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                lineNumber: 224,
+                                                                lineNumber: 194,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -820,52 +818,52 @@ function LandingPage() {
                                                                 children: "LLAMAR"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                                lineNumber: 234,
+                                                                lineNumber: 202,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                        lineNumber: 216,
+                                                        lineNumber: 189,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                                lineNumber: 201,
+                                                lineNumber: 178,
                                                 columnNumber: 21
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                            lineNumber: 198,
+                                            lineNumber: 177,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$2$2e$6_react$2d$dom$40$19$2e$1$2e$0_react$40$19$2e$1$2e$0_$5f$react$40$19$2e$1$2e$0$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "absolute bottom-2 left-1/2 -translate-x-1/2 w-[100px] h-[5px] bg-white rounded-full z-50"
                                         }, void 0, false, {
                                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                            lineNumber: 243,
+                                            lineNumber: 210,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                    lineNumber: 127,
+                                    lineNumber: 118,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                                lineNumber: 124,
+                                lineNumber: 117,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                            lineNumber: 121,
+                            lineNumber: 116,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-                        lineNumber: 113,
+                        lineNumber: 109,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
@@ -876,12 +874,12 @@ function LandingPage() {
             ]
         }, void 0, true, {
             fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-            lineNumber: 39,
+            lineNumber: 37,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/artifacts/radar-proptech/app/(marketing)/page.tsx",
-        lineNumber: 38,
+        lineNumber: 36,
         columnNumber: 5
     }, this));
 }
