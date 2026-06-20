@@ -1,18 +1,5 @@
 {
-  "node": {
-    "40f01648c3f8b449958234ebe4ebc6f48da83988ee": {
-      "workers": {
-        "app/(marketing)/page": {
-          "moduleId": "[project]/artifacts/radar-proptech/.next-internal/server/app/(marketing)/page/actions.js { ACTIONS_MODULE0 => \"[project]/artifacts/radar-proptech/app/(marketing)/actions/subscribe.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false,
-          "exportedName": "subscribeEmail",
-          "filename": "artifacts/radar-proptech/app/(marketing)/actions/subscribe.ts"
-        }
-      },
-      "filename": "artifacts/radar-proptech/app/(marketing)/actions/subscribe.ts",
-      "exportedName": "subscribeEmail"
-    }
-  },
+  "node": {},
   "edge": {},
-  "encryptionKey": "2yJ5HAH2008k+23Pb5h0GU6nf0UbOpxOjP0VYwqiGzs="
+  "encryptionKey": "TaKJP8xe9UP+i3poVUvqfpoahw9T3M1F24HpsxYRvQo="
 }
