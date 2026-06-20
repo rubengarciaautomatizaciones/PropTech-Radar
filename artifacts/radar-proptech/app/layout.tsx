@@ -16,8 +16,14 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata = {
-  title: "KAVOX | Inteligencia de Captación Inmobiliaria",
-  description: "El único radar PropTech sub-segundo que te pone en el teléfono del particular antes que nadie.",
+  title: "KAVOX | Alertas de Particulares en Tiempo Real",
+  description: "Recibe una notificación en tu móvil en el instante exacto en que un particular publica un anuncio. Te damos el teléfono en bandeja para que llames el primero y cierres la exclusiva.",
+  // 1. ESTO LE DICE A GOOGLE EL NOMBRE DE TU MARCA
+  applicationName: "KAVOX",
+  openGraph: {
+    siteName: "KAVOX",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -27,7 +33,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      {/* 2. Inyectamos las variables CSS de las fuentes en el body */}
+      <head>
+        {/* 2. SCRIPT OFICIAL DE GOOGLE PARA FORZAR EL NOMBRE DEL SITIO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "KAVOX",
+              "url": "https://kavox.tech/"
+            })
+          }}
+        />
+      </head>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased bg-kavox-bg text-kavox-body selection:bg-kavox-accent selection:text-white min-h-screen flex flex-col`}>
         {children}
       </body>

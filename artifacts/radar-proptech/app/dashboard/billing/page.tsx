@@ -22,7 +22,7 @@ export default function BillingPage() {
     <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-500">
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Facturación y Planes</h1>
-        <p className="text-gray-500 mt-1">Gestiona tu suscripción a Radar PropTech y tus métodos de pago.</p>
+        <p className="text-gray-500 mt-1">Gestiona tu suscripción a KAVOX y tus métodos de pago.</p>
       </div>
 
       {error && (

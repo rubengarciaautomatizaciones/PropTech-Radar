@@ -49,8 +49,14 @@ export default function Sidebar({ rol }: { rol: string }) {
 
         {/* CABECERA / LOGO */}
         <div className="h-16 flex items-center justify-center group-hover:justify-start px-5 border-b border-slate-800 overflow-hidden shrink-0">
-          <span className="text-xl font-bold tracking-tight text-kavox-accent group-hover:hidden">K</span>
-          <span className="text-lg font-bold tracking-tight hidden group-hover:block whitespace-nowrap">Radar PropTech</span>
+          {/* Icono cuando la barra está cerrada */}
+          <img src="/icon.png" alt="KAVOX" className="w-8 h-8 object-contain group-hover:hidden rounded-md" />
+
+          {/* Icono + Texto cuando la barra se expande */}
+          <div className="hidden group-hover:flex items-center gap-3">
+            <img src="/icon.png" alt="KAVOX" className="w-7 h-7 object-contain rounded-md" />
+            <span className="text-lg font-bold tracking-tight whitespace-nowrap">KAVOX</span>
+          </div>
         </div>
 
         {/* NAVEGACIÓN */}
