@@ -17,7 +17,7 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata = {
   title: "KAVOX | Alertas de Particulares en Tiempo Real",
-  description: "Recibe una notificación en tu móvil en el instante exacto en que un particular publica un anuncio. Te damos el teléfono en bandeja para que llames el primero y cierres la exclusiva.",
+  description: "Deja de perder exclusivas por llegar horas tarde. KAVOX intercepta los anuncios de particulares al momento en el que son publicados y te avisa al móvil para que seas el primero en llamar.",
   // 1. ESTO LE DICE A GOOGLE EL NOMBRE DE TU MARCA
   applicationName: "KAVOX",
   openGraph: {
